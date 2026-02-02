@@ -15,7 +15,7 @@ for a in client.get_activities():
         year = a.start_date_local.year
         y = years[year]
         y["count"] += 1
-        y["time"] += int(a.elapsed_time) if a.elapsed_time else 0
+        y["time"] += int(a.moving_time) if a.moving_time else 0
         y["distance"] += float(a.distance) / 1000 if a.distance else 0
         y["elevation"] += float(a.total_elevation_gain) if a.total_elevation_gain else 0
 

@@ -3,3 +3,5 @@
 .env
 venv
 .tokens.json
+*.pyc
+__pycache__

@@ -1,68 +1,66 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Yearly Cycling Stats</title>
-  <style>
-    body { font-family: system-ui, sans-serif; max-width: 960px; margin: 2rem auto; padding: 0 1rem; }
-    table { border-collapse: collapse; width: 100%; }
-    th, td { padding: 0.5rem 1rem; text-align: right; border-bottom: 1px solid #ddd; }
-    th { border-bottom: 2px solid #333; }
-    th:first-child, td:first-child { text-align: left; }
-  </style>
-</head>
-<body>
-  <h1>Yearly Cycling Stats</h1>
-  <table>
-    <thead>
-      <tr>
-        <th>Year</th>
-        <th>Rides</th>
-        <th>Time</th>
-        <th>Distance (km)</th>
-        <th>Elevation (m)</th>
-        <th>Avg km/wk</th>
-        <th>Avg m/wk</th>
-      </tr>
-    </thead>
-    <tbody id="stats"></tbody>
-  </table>
-  <script>
-    function formatTime(seconds) {
-      const h = Math.floor(seconds / 3600);
-      const m = Math.floor((seconds % 3600) / 60);
-      return h + "h " + String(m).padStart(2, "0") + "m";
-    }
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Yearly Cycling Stats</title>
+        <link rel="stylesheet" href="reset.css">
+        <link rel="stylesheet" href="base.css">
+        <link rel="stylesheet" href="local.css">
+    </head>
+    <body>
+        <main>
+            <h1>Yearly Cycling Stats</h1>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Year</th>
+                        <th>Rides</th>
+                        <th>Time</th>
+                        <th>Distance (km)</th>
+                        <th>Elevation (m)</th>
+                        <th>Avg km/wk</th>
+                        <th>Avg m/wk</th>
+                    </tr>
+                </thead>
+                <tbody id="stats"></tbody>
+            </table>
+            <script>
+                function formatTime(seconds) {
+                    const h = Math.floor(seconds / 3600);
+                    const m = Math.floor((seconds % 3600) / 60);
+                    return h + "h " + String(m).padStart(2, "0") + "m";
+                }
 
-    function weeksInYear(year) {
-      const now = new Date();
-      const yr = parseInt(year);
-      if (yr < now.getFullYear()) return 52;
-      const start = new Date(yr, 0, 1);
-      return Math.max(1, (now - start) / (7 * 24 * 60 * 60 * 1000));
-    }
+                function weeksInYear(year) {
+                    const now = new Date();
+                    const yr = parseInt(year);
+                    if (yr < now.getFullYear()) return 52;
+                    const start = new Date(yr, 0, 1);
+                    return Math.max(1, (now - start) / (7 * 24 * 60 * 60 * 1000));
+                }
 
-    fetch("/data.json")
-      .then(res => res.json())
-      .then(data => {
-        const tbody = document.getElementById("stats");
-        const years = Object.keys(data).sort((a, b) => a - b);
-        for (const year of years) {
-          const y = data[year];
-          const weeks = weeksInYear(year);
-          const tr = document.createElement("tr");
-          tr.innerHTML =
-            "<td>" + year + "</td>" +
-            "<td>" + y.count.toLocaleString() + "</td>" +
-            "<td>" + formatTime(y.time) + "</td>" +
-            "<td>" + y.distance.toLocaleString(undefined, {minimumFractionDigits: 1, maximumFractionDigits: 1}) + "</td>" +
-            "<td>" + Math.round(y.elevation).toLocaleString() + "</td>" +
-            "<td>" + (y.distance / weeks).toFixed(1) + "</td>" +
-            "<td>" + Math.round(y.elevation / weeks).toLocaleString() + "</td>";
-          tbody.appendChild(tr);
-        }
-      });
-  </script>
-</body>
+                fetch("/data.json")
+                    .then(res => res.json())
+                    .then(data => {
+                        const tbody = document.getElementById("stats");
+                        const years = Object.keys(data).sort((a, b) => a - b);
+                        for (const year of years) {
+                            const y = data[year];
+                            const weeks = weeksInYear(year);
+                            const tr = document.createElement("tr");
+                            tr.innerHTML =
+                                "<td>" + year + "</td>" +
+                                "<td>" + y.count.toLocaleString() + "</td>" +
+                                "<td>" + formatTime(y.time) + "</td>" +
+                                "<td>" + y.distance.toLocaleString(undefined, {minimumFractionDigits: 1, maximumFractionDigits: 1}) + "</td>" +
+                                "<td>" + Math.round(y.elevation).toLocaleString() + "</td>" +
+                                "<td>" + (y.distance / weeks).toFixed(1) + "</td>" +
+                                "<td>" + Math.round(y.elevation / weeks).toLocaleString() + "</td>";
+                            tbody.appendChild(tr);
+                        }
+                    });
+            </script>
+        </main>
+    </body>
 </html>

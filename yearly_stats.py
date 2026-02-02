@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
+import json
 from collections import defaultdict
+from pathlib import Path
 
 from auth import get_authenticated_client
 
 RIDE_TYPES = {"Ride", "VirtualRide", "EBikeRide"}
+DATA_FILE = Path(__file__).parent / "public" / "data.json"
 
 client = get_authenticated_client()
 
@@ -18,6 +21,10 @@ for a in client.get_activities():
         y["time"] += int(a.moving_time) if a.moving_time else 0
         y["distance"] += float(a.distance) / 1000 if a.distance else 0
         y["elevation"] += float(a.total_elevation_gain) if a.total_elevation_gain else 0
+
+data = {str(k): v for k, v in sorted(years.items())}
+DATA_FILE.write_text(json.dumps(data, indent=2))
+print(f"Saved data to {DATA_FILE}")
 
 header = f"{'Year':>6}  {'Rides':>7}  {'Time':>12}  {'Distance':>12}  {'Elevation':>12}"
 print(header)

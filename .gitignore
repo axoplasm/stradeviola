@@ -1,7 +1,9 @@
 *.swp
+*.swo
 .claude
 .env
 venv
 .tokens.json
 *.pyc
 __pycache__
+data.json

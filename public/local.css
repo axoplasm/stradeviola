@@ -1,5 +1,7 @@
 /* Local stylesheet contains only classes and provides special behaviors */
-
+.center {
+    text-align: center;
+}
 .main-nav {
     margin-inline: auto;
     max-width: 50rem;

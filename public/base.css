@@ -62,20 +62,6 @@ html {
     scroll-behavior: smooth;
 }
 
-@media (color-gamut: p3) {
-    html {
-        /* High gamut colors */
-        --red: color(display-p3 1 0 0);
-        --orange: color(display-p3 1 0.6 0);
-        --yellow: color(display-p3 1 1 0);
-        --green: color(display-p3 0.239 0.81 0.066);
-        --blue: light-dark(
-            color(display-p3 0.005 0.005 1),
-            color(display-p3 0.25 0.25 1)
-        );
-        --purple: color(display-p3 0.553 0.036 0.589);
-    }
-}
 *:focus, *:focus-visible {
     outline-color: color-mix(in srgb, var(--blue) 40%, transparent);
     outline-style: solid;

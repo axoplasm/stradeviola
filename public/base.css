@@ -319,6 +319,8 @@ table {
     margin-block: var(--grid);
 }
 tbody {
+    font-family: var(--monospace);
+    text-align: right;
 }
 thead, tfoot {
     background-color: var(--quiet);

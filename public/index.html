@@ -11,6 +11,7 @@
     <body>
         <main>
             <h1>Yearly Cycling Stats</h1>
+            <canvas id="chart"></canvas>
             <table>
                 <thead>
                     <tr>
@@ -40,14 +41,96 @@
                     return Math.max(1, (now - start) / (7 * 24 * 60 * 60 * 1000));
                 }
 
+                function drawChart(years, avgKmPerWk) {
+                    const canvas = document.getElementById("chart");
+                    const ctx = canvas.getContext("2d");
+                    const dpr = window.devicePixelRatio || 1;
+
+                    const cssWidth = canvas.clientWidth;
+                    const cssHeight = 300;
+                    canvas.style.height = cssHeight + "px";
+                    canvas.width = cssWidth * dpr;
+                    canvas.height = cssHeight * dpr;
+                    ctx.scale(dpr, dpr);
+
+                    const pad = {top: 20, right: 20, bottom: 40, left: 50};
+                    const w = cssWidth - pad.left - pad.right;
+                    const h = cssHeight - pad.top - pad.bottom;
+
+                    const maxVal = Math.ceil(Math.max(...avgKmPerWk) / 25) * 25;
+                    const n = years.length;
+
+                    ctx.font = "12px system-ui, sans-serif";
+                    ctx.textAlign = "center";
+                    ctx.textBaseline = "top";
+
+                    // Y gridlines and labels
+                    ctx.textAlign = "right";
+                    ctx.textBaseline = "middle";
+                    const steps = 5;
+                    for (let i = 0; i <= steps; i++) {
+                        const val = (maxVal / steps) * i;
+                        const y = pad.top + h - (h * val / maxVal);
+                        ctx.strokeStyle = "#e0e0e0";
+                        ctx.beginPath();
+                        ctx.moveTo(pad.left, y);
+                        ctx.lineTo(pad.left + w, y);
+                        ctx.stroke();
+                        ctx.fillStyle = "#666";
+                        ctx.fillText(Math.round(val), pad.left - 8, y);
+                    }
+
+                    // Y axis label
+                    ctx.save();
+                    ctx.translate(14, pad.top + h / 2);
+                    ctx.rotate(-Math.PI / 2);
+                    ctx.textAlign = "center";
+                    ctx.fillStyle = "#666";
+                    ctx.fillText("km/wk", 0, 0);
+                    ctx.restore();
+
+                    // X labels
+                    ctx.textAlign = "center";
+                    ctx.textBaseline = "top";
+                    ctx.fillStyle = "#666";
+                    for (let i = 0; i < n; i++) {
+                        const x = pad.left + (w / (n - 1)) * i;
+                        ctx.fillText(years[i], x, pad.top + h + 8);
+                    }
+
+                    // Line
+                    ctx.beginPath();
+                    ctx.strokeStyle = "#2563eb";
+                    ctx.lineWidth = 2;
+                    for (let i = 0; i < n; i++) {
+                        const x = pad.left + (w / (n - 1)) * i;
+                        const y = pad.top + h - (h * avgKmPerWk[i] / maxVal);
+                        if (i === 0) ctx.moveTo(x, y);
+                        else ctx.lineTo(x, y);
+                    }
+                    ctx.stroke();
+
+                    // Points
+                    ctx.fillStyle = "#2563eb";
+                    for (let i = 0; i < n; i++) {
+                        const x = pad.left + (w / (n - 1)) * i;
+                        const y = pad.top + h - (h * avgKmPerWk[i] / maxVal);
+                        ctx.beginPath();
+                        ctx.arc(x, y, 3, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                }
+
                 fetch("/data.json")
                     .then(res => res.json())
                     .then(data => {
                         const tbody = document.getElementById("stats");
                         const years = Object.keys(data).sort((a, b) => a - b);
+                        const avgKmPerWk = [];
                         for (const year of years) {
                             const y = data[year];
                             const weeks = weeksInYear(year);
+                            avgKmPerWk.push(y.distance / weeks);
                             const tr = document.createElement("tr");
                             tr.innerHTML =
                                 "<th>" + year + "</th>" +
@@ -59,6 +142,7 @@
                                 "<td>" + Math.round(y.elevation / weeks).toLocaleString() + "</td>";
                             tbody.appendChild(tr);
                         }
+                        drawChart(years, avgKmPerWk);
                     });
             </script>
         </main>

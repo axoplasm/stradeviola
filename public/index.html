@@ -20,8 +20,8 @@
                         <th>time</th>
                         <th>dist(km)</th>
                         <th>elev(m)</th>
-                        <th class='fg-green'>avg_km/wk</th>
-                        <th class='fg-purple'>avg_m/wk</th>
+                        <th class='fg-green'>km/wk</th>
+                        <th class='fg-purple'>m/wk</th>
                     </tr>
                 </thead>
                 <tbody id="stats"></tbody>
@@ -31,7 +31,7 @@
                 function formatTime(seconds) {
                     const h = Math.floor(seconds / 3600);
                     const m = Math.floor((seconds % 3600) / 60);
-                    return h + "h" + String(m).padStart(2, "0") + "m";
+                    return h + "<span class='fg-whisper'>h</span>" + String(m).padStart(2, "0") + "<span class='fg-whisper'>m</span>";
                 }
 
                 function weeksInYear(year) {
@@ -56,7 +56,7 @@
 
                     const kmColor = "hsl(120, 100%, 25%)";
                     const elevColor = "hsl(300, 100%, 25%)";
-                    const pad = {top: 20, right: 55, bottom: 40, left: 50};
+                    const pad = {top: 24, right: 65, bottom: 46, left: 58};
                     const w = cssWidth - pad.left - pad.right;
                     const h = cssHeight - pad.top - pad.bottom;
                     const n = years.length;
@@ -64,7 +64,7 @@
                     const maxKm = Math.ceil(Math.max(...avgKmPerWk) / 25) * 25;
                     const maxElev = Math.ceil(Math.max(...avgMPerWk) / 500) * 500;
 
-                    ctx.font = "12px 'IBM Plex Mono', monospace";
+                    ctx.font = "14px 'IBM Plex Mono', monospace";
 
                     // Y gridlines (left axis)
                     ctx.textAlign = "right";

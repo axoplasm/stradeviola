@@ -41,7 +41,7 @@ html {
     --serif: Charter, 'Bitstream Charter', 'Sitka Text', Cambria, serif;
     --monospace: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace;
     --default-line-height: 1.5;
-    --default-font-size: 18px;
+    --default-font-size: 14px;
     --smaller-font-size: 85%;
     --bigger-font-size: 120%;
     --light-weight: 200;
@@ -77,7 +77,7 @@ body {
 }
 main {
     margin-inline: auto;
-    max-width: 50rem;
+    max-width: 60rem;
     padding-inline: 1rem;
 }
 

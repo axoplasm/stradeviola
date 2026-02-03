@@ -15,16 +15,17 @@
             <table>
                 <thead>
                     <tr>
-                        <th>Year</th>
-                        <th>Rides</th>
-                        <th>Time</th>
-                        <th>Distance (km)</th>
-                        <th>Elevation (m)</th>
-                        <th>Avg km/wk</th>
-                        <th>Avg m/wk</th>
+                        <th>year</th>
+                        <th>rides</th>
+                        <th>time</th>
+                        <th>dist(km)</th>
+                        <th>elev(m)</th>
+                        <th>avg_km/wk</th>
+                        <th>avg_m/wk</th>
                     </tr>
                 </thead>
                 <tbody id="stats"></tbody>
+                <tfoot id="totals"></tfoot>
             </table>
             <script>
                 function formatTime(seconds) {
@@ -151,11 +152,17 @@
                         const years = Object.keys(data).sort((a, b) => a - b);
                         const avgKmPerWk = [];
                         const avgMPerWk = [];
+                        let totalCount = 0, totalTime = 0, totalDist = 0, totalElev = 0, totalWeeks = 0;
                         for (const year of years) {
                             const y = data[year];
                             const weeks = weeksInYear(year);
                             avgKmPerWk.push(y.distance / weeks);
                             avgMPerWk.push(y.elevation / weeks);
+                            totalCount += y.count;
+                            totalTime += y.time;
+                            totalDist += y.distance;
+                            totalElev += y.elevation;
+                            totalWeeks += weeks;
                             const tr = document.createElement("tr");
                             tr.innerHTML =
                                 "<th>" + year + "</th>" +
@@ -167,6 +174,17 @@
                                 "<td>" + Math.round(y.elevation / weeks).toLocaleString() + "</td>";
                             tbody.appendChild(tr);
                         }
+                        const tfoot = document.getElementById("totals");
+                        const tfootRow = document.createElement("tr");
+                        tfootRow.innerHTML =
+                            "<th>TOTAL</th>" +
+                            "<td>" + totalCount.toLocaleString() + "</td>" +
+                            "<td>" + formatTime(totalTime) + "</td>" +
+                            "<td>" + totalDist.toLocaleString(undefined, {minimumFractionDigits: 1, maximumFractionDigits: 1}) + "</td>" +
+                            "<td>" + Math.round(totalElev).toLocaleString() + "</td>" +
+                            "<td>" + (totalDist / totalWeeks).toFixed(1) + "</td>" +
+                            "<td>" + Math.round(totalElev / totalWeeks).toLocaleString() + "</td>";
+                        tfoot.appendChild(tfootRow);
                         drawChart(years, avgKmPerWk, avgMPerWk);
                     });
             </script>

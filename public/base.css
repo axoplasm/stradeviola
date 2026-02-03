@@ -331,16 +331,16 @@ figcaption {
 /* table */
 table {
     border: var(--border-width) solid var(--hushed);
-    font-family: var(--sans-serif);
+    font-family: var(--monospace);
     margin-block: var(--grid);
     margin-inline: auto;
+    text-align: right;
 }
 tbody {
-    font-family: var(--monospace);
-    text-align: right;
 }
 thead, tfoot {
     background-color: var(--quiet);
+    font-weight: var(--bold-weight);
 }
 thead {
     border-block-end: var(--border-width) solid var(--whisper);

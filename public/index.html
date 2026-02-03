@@ -199,6 +199,13 @@
                             "<td class='fg-purple'>" + Math.round(totalElev / totalWeeks).toLocaleString() + "</td>";
                         tfoot.appendChild(avgRow);
                         drawChart(years, avgKmPerWk, avgMPerWk);
+                        let resizeTimer;
+                        window.addEventListener("resize", function () {
+                            clearTimeout(resizeTimer);
+                            resizeTimer = setTimeout(function () {
+                                drawChart(years, avgKmPerWk, avgMPerWk);
+                            }, 100);
+                        });
                     });
             </script>
         </main>

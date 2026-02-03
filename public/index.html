@@ -182,9 +182,20 @@
                             "<td>" + formatTime(totalTime) + "</td>" +
                             "<td>" + totalDist.toLocaleString(undefined, {minimumFractionDigits: 1, maximumFractionDigits: 1}) + "</td>" +
                             "<td>" + Math.round(totalElev).toLocaleString() + "</td>" +
+                            "<td></td>" +
+                            "<td></td>";
+                        tfoot.appendChild(tfootRow);
+                        const n = years.length;
+                        const avgRow = document.createElement("tr");
+                        avgRow.innerHTML =
+                            "<th>AVG</th>" +
+                            "<td>" + Math.round(totalCount / n).toLocaleString() + "</td>" +
+                            "<td>" + formatTime(Math.round(totalTime / n)) + "</td>" +
+                            "<td>" + (totalDist / n).toLocaleString(undefined, {minimumFractionDigits: 1, maximumFractionDigits: 1}) + "</td>" +
+                            "<td>" + Math.round(totalElev / n).toLocaleString() + "</td>" +
                             "<td>" + (totalDist / totalWeeks).toFixed(1) + "</td>" +
                             "<td>" + Math.round(totalElev / totalWeeks).toLocaleString() + "</td>";
-                        tfoot.appendChild(tfootRow);
+                        tfoot.appendChild(avgRow);
                         drawChart(years, avgKmPerWk, avgMPerWk);
                     });
             </script>

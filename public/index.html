@@ -20,8 +20,8 @@
                         <th>time</th>
                         <th>dist(km)</th>
                         <th>elev(m)</th>
-                        <th>avg_km/wk</th>
-                        <th>avg_m/wk</th>
+                        <th class='fg-green'>avg_km/wk</th>
+                        <th class='fg-purple'>avg_m/wk</th>
                     </tr>
                 </thead>
                 <tbody id="stats"></tbody>
@@ -118,10 +118,11 @@
                         ctx.fillText(years[i], x, pad.top + h + 8);
                     }
 
-                    function drawLine(values, maxVal, color) {
+                    function drawLine(values, maxVal, color, dashed) {
                         ctx.beginPath();
                         ctx.strokeStyle = color;
                         ctx.lineWidth = 2;
+                        ctx.setLineDash(dashed ? [2, 2] : []);
                         for (let i = 0; i < n; i++) {
                             const x = pad.left + (w / (n - 1)) * i;
                             const y = pad.top + h - (h * values[i] / maxVal);
@@ -135,13 +136,13 @@
                             const x = pad.left + (w / (n - 1)) * i;
                             const y = pad.top + h - (h * values[i] / maxVal);
                             ctx.beginPath();
-                            ctx.arc(x, y, 3, 0, Math.PI * 2);
+                            ctx.arc(x, y, 4, 0, Math.PI * 2);
                             ctx.fill();
                         }
                     }
 
-                    drawLine(avgKmPerWk, maxKm, kmColor);
-                    drawLine(avgMPerWk, maxElev, elevColor);
+                    drawLine(avgKmPerWk, maxKm, kmColor, false);
+                    drawLine(avgMPerWk, maxElev, elevColor, true);
                 }
 
                 fetch("/data.json")
@@ -170,8 +171,8 @@
                                 "<td>" + formatTime(y.time) + "</td>" +
                                 "<td>" + y.distance.toLocaleString(undefined, {minimumFractionDigits: 1, maximumFractionDigits: 1}) + "</td>" +
                                 "<td>" + Math.round(y.elevation).toLocaleString() + "</td>" +
-                                "<td>" + (y.distance / weeks).toFixed(1) + "</td>" +
-                                "<td>" + Math.round(y.elevation / weeks).toLocaleString() + "</td>";
+                                "<td class='fg-green'>" + (y.distance / weeks).toFixed(1) + "</td>" +
+                                "<td class='fg-purple'>" + Math.round(y.elevation / weeks).toLocaleString() + "</td>";
                             tbody.appendChild(tr);
                         }
                         const tfoot = document.getElementById("totals");
@@ -194,8 +195,8 @@
                             "<td>" + formatTime(Math.round(totalTime / effectiveYears)) + "</td>" +
                             "<td>" + (totalDist / effectiveYears).toLocaleString(undefined, {minimumFractionDigits: 1, maximumFractionDigits: 1}) + "</td>" +
                             "<td>" + Math.round(totalElev / effectiveYears).toLocaleString() + "</td>" +
-                            "<td>" + (totalDist / totalWeeks).toFixed(1) + "</td>" +
-                            "<td>" + Math.round(totalElev / totalWeeks).toLocaleString() + "</td>";
+                            "<td class='fg-green'>" + (totalDist / totalWeeks).toFixed(1) + "</td>" +
+                            "<td class='fg-purple'>" + Math.round(totalElev / totalWeeks).toLocaleString() + "</td>";
                         tfoot.appendChild(avgRow);
                         drawChart(years, avgKmPerWk, avgMPerWk);
                     });

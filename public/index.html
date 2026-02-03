@@ -56,7 +56,8 @@
 
                     const kmColor = "hsl(120, 100%, 25%)";
                     const elevColor = "hsl(300, 100%, 25%)";
-                    const pad = {top: 24, right: 65, bottom: 46, left: 58};
+                    const narrow = cssWidth < 700;
+                    const pad = {top: 24, right: 65, bottom: narrow ? 70 : 46, left: 58};
                     const w = cssWidth - pad.left - pad.right;
                     const h = cssHeight - pad.top - pad.bottom;
                     const n = years.length;
@@ -110,12 +111,16 @@
                     ctx.restore();
 
                     // X labels
-                    ctx.textAlign = "center";
-                    ctx.textBaseline = "top";
                     ctx.fillStyle = "#666";
                     for (let i = 0; i < n; i++) {
                         const x = pad.left + (w / (n - 1)) * i;
-                        ctx.fillText(years[i], x, pad.top + h + 8);
+                        ctx.save();
+                        ctx.translate(x, pad.top + h + 8);
+                        ctx.rotate(-Math.PI / 4);
+                        ctx.textAlign = "right";
+                        ctx.textBaseline = "middle";
+                        ctx.fillText(years[i], 0, 0);
+                        ctx.restore();
                     }
 
                     function drawLine(values, maxVal, color, dashed) {

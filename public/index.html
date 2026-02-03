@@ -185,14 +185,15 @@
                             "<td></td>" +
                             "<td></td>";
                         tfoot.appendChild(tfootRow);
-                        const n = years.length;
+                        const currentYearFraction = weeksInYear(String(new Date().getFullYear())) / 52;
+                        const effectiveYears = years.length - 1 + currentYearFraction;
                         const avgRow = document.createElement("tr");
                         avgRow.innerHTML =
                             "<th>AVG</th>" +
-                            "<td>" + Math.round(totalCount / n).toLocaleString() + "</td>" +
-                            "<td>" + formatTime(Math.round(totalTime / n)) + "</td>" +
-                            "<td>" + (totalDist / n).toLocaleString(undefined, {minimumFractionDigits: 1, maximumFractionDigits: 1}) + "</td>" +
-                            "<td>" + Math.round(totalElev / n).toLocaleString() + "</td>" +
+                            "<td>" + Math.round(totalCount / effectiveYears).toLocaleString() + "</td>" +
+                            "<td>" + formatTime(Math.round(totalTime / effectiveYears)) + "</td>" +
+                            "<td>" + (totalDist / effectiveYears).toLocaleString(undefined, {minimumFractionDigits: 1, maximumFractionDigits: 1}) + "</td>" +
+                            "<td>" + Math.round(totalElev / effectiveYears).toLocaleString() + "</td>" +
                             "<td>" + (totalDist / totalWeeks).toFixed(1) + "</td>" +
                             "<td>" + Math.round(totalElev / totalWeeks).toLocaleString() + "</td>";
                         tfoot.appendChild(avgRow);

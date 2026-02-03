@@ -11,7 +11,7 @@
     <body>
         <main>
             <h1>Yearly Cycling Stats</h1>
-            <canvas id="chart"></canvas>
+            <canvas id="chart" style="width:100%"></canvas>
             <table>
                 <thead>
                     <tr>
@@ -125,6 +125,7 @@
                     .then(res => res.json())
                     .then(data => {
                         const tbody = document.getElementById("stats");
+                        delete data["2011"];
                         const years = Object.keys(data).sort((a, b) => a - b);
                         const avgKmPerWk = [];
                         for (const year of years) {

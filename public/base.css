@@ -1,20 +1,10 @@
 /* Base stylesheet contains only HTML elements & provides default appearance */
 
-/* IBM Plex Sans */
-@font-face { font-family: 'IBM Plex Sans'; font-weight: 200; font-style: normal; src: url('/plex/IBMPlexSans-ExtraLight.woff2') format('woff2'); }
-@font-face { font-family: 'IBM Plex Sans'; font-weight: 200; font-style: italic; src: url('/plex/IBMPlexSans-ExtraLightItalic.woff2') format('woff2'); }
-@font-face { font-family: 'IBM Plex Sans'; font-weight: 400; font-style: normal; src: url('/plex/IBMPlexSans-Regular.woff2') format('woff2'); }
-@font-face { font-family: 'IBM Plex Sans'; font-weight: 400; font-style: italic; src: url('/plex/IBMPlexSans-RegularItalic.woff2') format('woff2'); }
-@font-face { font-family: 'IBM Plex Sans'; font-weight: 600; font-style: normal; src: url('/plex/IBMPlexSans-SemiBold.woff2') format('woff2'); }
-@font-face { font-family: 'IBM Plex Sans'; font-weight: 600; font-style: italic; src: url('/plex/IBMPlexSans-SemiBoldItalic.woff2') format('woff2'); }
-@font-face { font-family: 'IBM Plex Sans'; font-weight: 800; font-style: normal; src: url('/plex/IBMPlexSans-Bold.woff2') format('woff2'); }
-@font-face { font-family: 'IBM Plex Sans'; font-weight: 800; font-style: italic; src: url('/plex/IBMPlexSans-BoldItalic.woff2') format('woff2'); }
-
 /* IBM Plex Mono */
 @font-face { font-family: 'IBM Plex Mono'; font-weight: 400; font-style: normal; src: url('/plex/IBMPlexMono-Regular.woff2') format('woff2'); }
 @font-face { font-family: 'IBM Plex Mono'; font-weight: 400; font-style: italic; src: url('/plex/IBMPlexMono-RegularItalic.woff2') format('woff2'); }
-@font-face { font-family: 'IBM Plex Mono'; font-weight: 600; font-style: normal; src: url('/plex/IBMPlexMono-SemiBold.woff2') format('woff2'); }
-@font-face { font-family: 'IBM Plex Mono'; font-weight: 600; font-style: italic; src: url('/plex/IBMPlexMono-SemiBoldItalic.woff2') format('woff2'); }
+@font-face { font-family: 'IBM Plex Mono'; font-weight: 600; font-style: normal; src: url('/plex/IBMPlexMono-Bold.woff2') format('woff2'); }
+@font-face { font-family: 'IBM Plex Mono'; font-weight: 600; font-style: italic; src: url('/plex/IBMPlexMono-BoldItalic.woff2') format('woff2'); }
 
 :root {
     color-scheme: light dark;
@@ -53,7 +43,7 @@ html {
     );
 
     /* type */
-    --sans-serif: 'IBM Plex Sans', 'Helvetica Neue', Inter, Roboto, 'Arial Nova', 'Nimbus Sans', Arial, sans-serif;
+    --sans-serif: 'Helvetica Neue', Inter, Roboto, 'Arial Nova', 'Nimbus Sans', Arial, sans-serif;
     --serif: Charter, 'Bitstream Charter', 'Sitka Text', Cambria, serif;
     --monospace: 'IBM Plex Mono', ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace;
     --default-line-height: 1.5;
@@ -113,7 +103,7 @@ main {
 
 /* headings */
 h1, h2, h3, h4, h5, h6 {
-    font-family: var(--sans-serif);
+    font-family: var(--monospace);
     font-weight: var(--bold-weight);
     small {
         font-weight: var(--light-weight);
@@ -126,13 +116,13 @@ h1, h2, h3 {
     }
 }
 h1 {
-    font-size: 3rem;
-}
-h2 {
     font-size: 2rem;
 }
-h3 {
+h2 {
     font-size: 1.5rem;
+}
+h3 {
+    font-size: 1.25rem;
 }
 h4, h5, h6 {
     margin-block-end: var(--grid);
@@ -325,7 +315,7 @@ figure, video {
 }
 figcaption {
     color: var(--hushed);
-    font-family: var(--sans-serif);
+    font-family: var(--monospace);
 }
 
 /* table */
@@ -360,7 +350,7 @@ th {
 }
 caption {
     color: var(--hushed);
-    font-family: var(--sans-serif);
+    font-family: var(--monospace);
 }
 
 /* forms */
@@ -376,7 +366,7 @@ fieldset {
     }
 }
 legend, label, input, select, textarea {
-    font-family: var(--sans-serif);
+    font-family: var(--monospace);
 }
 legend {
     background-color: transparent;
@@ -533,7 +523,7 @@ details {
     summary {
         background-color: var(--quiet);
         cursor: pointer;
-        font-family: var(--sans-serif);
+        font-family: var(--monospace);
         font-weight: var(--bold-weight);
         padding: var(--outer-padding);
         margin-block-start: calc(var(--outer-padding) * -1);
@@ -576,5 +566,5 @@ details[open] summary:before {
 /* intentionally unstyled */
 address, article, aside, div, footer, header, nav, search, section {
     display: block;
-    font-family: var(--sans-serif);
+    font-family: var(--monospace);
 }

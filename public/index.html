@@ -213,14 +213,29 @@
                             "<td class='fg-purple'>" + Math.round(totalElev / totalWeeks).toLocaleString() + "</td>";
                         tfoot.appendChild(avgRow);
                         var selectedIndex = -1;
-                        tbody.querySelectorAll("tr").forEach(function (tr, idx) {
+                        var rows = tbody.querySelectorAll("tr");
+                        function selectYear(idx) {
+                            selectedIndex = (selectedIndex === idx) ? -1 : idx;
+                            rows.forEach(function (r) { r.style.background = ""; });
+                            if (selectedIndex >= 0) rows[selectedIndex].style.background = "#eee";
+                            drawChart(years, avgKmPerWk, avgMPerWk, selectedIndex);
+                        }
+                        rows.forEach(function (tr, idx) {
                             tr.style.cursor = "pointer";
-                            tr.addEventListener("click", function () {
-                                selectedIndex = (selectedIndex === idx) ? -1 : idx;
-                                tbody.querySelectorAll("tr").forEach(function (r) { r.style.background = ""; });
-                                if (selectedIndex >= 0) tr.style.background = "#eee";
-                                drawChart(years, avgKmPerWk, avgMPerWk, selectedIndex);
-                            });
+                            tr.addEventListener("click", function () { selectYear(idx); });
+                        });
+                        var chart = document.getElementById("chart");
+                        chart.style.cursor = "pointer";
+                        chart.addEventListener("click", function (e) {
+                            var rect = this.getBoundingClientRect();
+                            var clickX = e.clientX - rect.left;
+                            var cssWidth = this.clientWidth;
+                            var padLeft = 58, padRight = 65;
+                            var w = cssWidth - padLeft - padRight;
+                            var n = years.length;
+                            var gap = w / (n - 1);
+                            var idx = Math.round((clickX - padLeft) / gap);
+                            if (idx >= 0 && idx < n) selectYear(idx);
                         });
                         drawChart(years, avgKmPerWk, avgMPerWk, selectedIndex);
                         let resizeTimer;

@@ -23,8 +23,8 @@
                 -moz-text-size-adjust: none;
                 -webkit-text-size-adjust: none;
                 text-size-adjust: none;
-                --green: hsl(120, 100%, 25%);
-                --purple: hsl(300, 100%, 25%);
+                --green: hsl(120, 100%, 30%);
+                --purple: hsl(300, 100%, 35%);
                 --black: hsl(0, 0%, 0%);
                 --white: hsl(0, 0%, 100%);
                 --loud: light-dark(var(--black), var(--white));
@@ -100,6 +100,7 @@
             .fg-green { color: var(--green); }
             .fg-purple { color: var(--purple); }
             .fg-whisper { color: var(--whisper); }
+            .bg-quiet { background-color: var(--quiet); }
         </style>
     </head>
     <body>
@@ -148,8 +149,8 @@
                     canvas.height = cssHeight * dpr;
                     ctx.scale(dpr, dpr);
 
-                    const kmColor = "hsl(120, 100%, 25%)";
-                    const elevColor = "hsl(300, 100%, 25%)";
+                    const kmColor = "hsl(120, 100%, 30%)";
+                    const elevColor = "hsl(300, 100%, 35%)";
                     const narrow = cssWidth < 700;
                     const pad = {top: 24, right: 65, bottom: narrow ? 70 : 46, left: 58};
                     const w = cssWidth - pad.left - pad.right;
@@ -310,8 +311,8 @@
                         var rows = tbody.querySelectorAll("tr");
                         function selectYear(idx) {
                             selectedIndex = (selectedIndex === idx) ? -1 : idx;
-                            rows.forEach(function (r) { r.style.background = ""; });
-                            if (selectedIndex >= 0) rows[selectedIndex].style.background = "#eee";
+                            rows.forEach(function (r) { r.classList.remove("bg-quiet"); });
+                            if (selectedIndex >= 0) rows[selectedIndex].classList.add("bg-quiet");
                             drawChart(years, avgKmPerWk, avgMPerWk, selectedIndex);
                         }
                         rows.forEach(function (tr, idx) {

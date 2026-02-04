@@ -4,9 +4,102 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>🚴stradeviola😈‍</title>
-        <link rel="stylesheet" href="reset.css">
-        <link rel="stylesheet" href="base.css">
-        <link rel="stylesheet" href="local.css">
+        <style>
+            /* Reset */
+            *:where(:not(html, iframe, canvas, img, svg, video, audio):not(svg *, symbol *)) {
+                all: unset;
+                display: revert;
+            }
+            *, *::before, *::after {
+                box-sizing: border-box;
+            }
+
+            /* Base */
+            :root {
+                color-scheme: light dark;
+            }
+            html {
+                -moz-text-size-adjust: none;
+                -webkit-text-size-adjust: none;
+                text-size-adjust: none;
+                --green: hsl(120, 100%, 25%);
+                --purple: hsl(300, 100%, 25%);
+                --black: hsl(0, 0%, 0%);
+                --white: hsl(0, 0%, 100%);
+                --loud: light-dark(var(--black), var(--white));
+                --hushed: light-dark(
+                    hsl(from var(--black) h 0% 50%),
+                    hsl(from var(--black) h 0% 60%)
+                );
+                --whisper: light-dark(
+                    hsl(from var(--black) h 0% 80%),
+                    hsl(from var(--black) h 0% 40%)
+                );
+                --quiet: light-dark(
+                    hsl(from var(--black) h 0% 95%),
+                    hsl(from var(--black) h 0% 20%)
+                );
+                --silent: light-dark(var(--white), var(--black));
+                --serif: Charter, 'Bitstream Charter', 'Sitka Text', Cambria, serif;
+                --monospace: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace;
+                --default-line-height: 1.5;
+                --default-font-size: 14px;
+                --bold-weight: 600;
+                --border-width: 1px;
+                --grid: 1rem;
+                font-size: var(--default-font-size);
+                scroll-behavior: smooth;
+            }
+            body {
+                background: var(--silent);
+                color: var(--loud);
+                container-type: inline-size;
+                font-family: var(--serif);
+                line-height: var(--default-line-height);
+            }
+            main {
+                margin-inline: auto;
+                max-width: 60rem;
+                padding-inline: 1rem;
+            }
+            h1 {
+                font-family: var(--monospace);
+                font-weight: var(--bold-weight);
+                margin-block-end: var(--grid);
+                font-size: 2rem;
+            }
+            table {
+                border-collapse: collapse;
+                border: var(--border-width) solid var(--hushed);
+                font-family: var(--monospace);
+                margin-block: var(--grid);
+                margin-inline: auto;
+                text-align: right;
+            }
+            thead, tfoot {
+                background-color: var(--quiet);
+                font-weight: var(--bold-weight);
+            }
+            thead {
+                border-block-end: var(--border-width) solid var(--whisper);
+            }
+            tfoot {
+                border-block-start: var(--border-width) solid var(--whisper);
+            }
+            td, th {
+                padding-block: calc(var(--grid) * 0.25);
+                padding-inline: calc(var(--grid) * 0.5);
+            }
+            th {
+                font-weight: var(--bold-weight);
+            }
+
+            /* Local */
+            .center { text-align: center; }
+            .fg-green { color: var(--green); }
+            .fg-purple { color: var(--purple); }
+            .fg-whisper { color: var(--whisper); }
+        </style>
     </head>
     <body>
         <main>

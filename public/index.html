@@ -42,7 +42,7 @@
                     return Math.max(1, (now - start) / (7 * 24 * 60 * 60 * 1000));
                 }
 
-                function drawChart(years, avgKmPerWk, avgMPerWk) {
+                function drawChart(years, avgKmPerWk, avgMPerWk, highlightIndex) {
                     const canvas = document.getElementById("chart");
                     const ctx = canvas.getContext("2d");
                     const dpr = window.devicePixelRatio || 1;
@@ -141,8 +141,17 @@
                             const x = pad.left + (w / (n - 1)) * i;
                             const y = pad.top + h - (h * values[i] / maxVal);
                             ctx.beginPath();
-                            ctx.arc(x, y, 4, 0, Math.PI * 2);
-                            ctx.fill();
+                            if (highlightIndex >= 0 && i === highlightIndex) {
+                                ctx.arc(x, y, 8, 0, Math.PI * 2);
+                                ctx.fill();
+                                ctx.strokeStyle = "#fff";
+                                ctx.lineWidth = 2;
+                                ctx.setLineDash([]);
+                                ctx.stroke();
+                            } else {
+                                ctx.arc(x, y, 4, 0, Math.PI * 2);
+                                ctx.fill();
+                            }
                         }
                     }
 
@@ -203,12 +212,22 @@
                             "<td class='fg-green'>" + (totalDist / totalWeeks).toFixed(1) + "</td>" +
                             "<td class='fg-purple'>" + Math.round(totalElev / totalWeeks).toLocaleString() + "</td>";
                         tfoot.appendChild(avgRow);
-                        drawChart(years, avgKmPerWk, avgMPerWk);
+                        var selectedIndex = -1;
+                        tbody.querySelectorAll("tr").forEach(function (tr, idx) {
+                            tr.style.cursor = "pointer";
+                            tr.addEventListener("click", function () {
+                                selectedIndex = (selectedIndex === idx) ? -1 : idx;
+                                tbody.querySelectorAll("tr").forEach(function (r) { r.style.background = ""; });
+                                if (selectedIndex >= 0) tr.style.background = "#eee";
+                                drawChart(years, avgKmPerWk, avgMPerWk, selectedIndex);
+                            });
+                        });
+                        drawChart(years, avgKmPerWk, avgMPerWk, selectedIndex);
                         let resizeTimer;
                         window.addEventListener("resize", function () {
                             clearTimeout(resizeTimer);
                             resizeTimer = setTimeout(function () {
-                                drawChart(years, avgKmPerWk, avgMPerWk);
+                                drawChart(years, avgKmPerWk, avgMPerWk, selectedIndex);
                             }, 100);
                         });
                     });

@@ -1,6 +1,8 @@
 import json
 import os
 import time
+import webbrowser
+from http.server import HTTPServer, BaseHTTPRequestHandler
 from pathlib import Path
 from urllib.parse import urlparse, parse_qs
 
@@ -11,7 +13,7 @@ load_dotenv()
 
 CLIENT_ID = int(os.environ["STRAVA_CLIENT_ID"])
 CLIENT_SECRET = os.environ["STRAVA_CLIENT_SECRET"]
-REDIRECT_URI = "https://stradeviola.axoplasm.com/callback"
+REDIRECT_URI = "http://localhost:8000/callback"
 TOKEN_FILE = Path(__file__).parent / ".tokens.json"
 
 
@@ -32,18 +34,38 @@ def authorize_via_browser(client: Client) -> dict:
         scope=["read", "activity:read_all"],
     )
 
-    print(f"Open this URL in a browser and authorize:\n\n{auth_url}\n")
-    print("After authorizing, paste the full redirect URL here:")
-    redirect_url = input("> ").strip()
+    class CallbackHandler(BaseHTTPRequestHandler):
+        def do_GET(self):
+            query = parse_qs(urlparse(self.path).query)
+            if "code" in query:
+                self.server.auth_code = query["code"][0]
+                self.send_response(200)
+                self.end_headers()
+                self.wfile.write(
+                    b"Authorization successful. You can close this tab."
+                )
+            else:
+                self.send_response(400)
+                self.end_headers()
+                self.wfile.write(b"Authorization failed: no code received.")
 
-    query = parse_qs(urlparse(redirect_url).query)
-    if "code" not in query:
-        raise SystemExit("No authorization code found in URL.")
+        def log_message(self, format, *args):
+            pass
+
+    print(f"Opening browser for Strava authorization...\n{auth_url}\n")
+    webbrowser.open(auth_url)
+
+    server = HTTPServer(("localhost", 8000), CallbackHandler)
+    server.auth_code = None
+    server.handle_request()
+
+    if not server.auth_code:
+        raise SystemExit("No authorization code received.")
 
     access_info = client.exchange_code_for_token(
         client_id=CLIENT_ID,
         client_secret=CLIENT_SECRET,
-        code=query["code"][0],
+        code=server.auth_code,
     )
     return dict(access_info)
 

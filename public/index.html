@@ -119,6 +119,10 @@
                         <th>elev(m)</th>
                         <th class='fg-green'>km/wk</th>
                         <th class='fg-purple'>m/wk</th>
+                        <th>dist(mi)</th>
+                        <th>elev(ft)</th>
+                        <th>mi/wk</th>
+                        <th>ft/wk</th>
                     </tr>
                 </thead>
                 <tbody id="stats"></tbody>
@@ -283,7 +287,11 @@
                                 "<td>" + y.distance.toLocaleString(undefined, {minimumFractionDigits: 1, maximumFractionDigits: 1}) + "</td>" +
                                 "<td>" + Math.round(y.elevation).toLocaleString() + "</td>" +
                                 "<td class='fg-green'>" + (y.distance / weeks).toFixed(1) + "</td>" +
-                                "<td class='fg-purple'>" + Math.round(y.elevation / weeks).toLocaleString() + "</td>";
+                                "<td class='fg-purple'>" + Math.round(y.elevation / weeks).toLocaleString() + "</td>" +
+                                "<td>" + (y.distance * 0.621371).toLocaleString(undefined, {minimumFractionDigits: 1, maximumFractionDigits: 1}) + "</td>" +
+                                "<td>" + Math.round(y.elevation * 3.28084).toLocaleString() + "</td>" +
+                                "<td>" + (y.distance * 0.621371 / weeks).toFixed(1) + "</td>" +
+                                "<td>" + Math.round(y.elevation * 3.28084 / weeks).toLocaleString() + "</td>";
                             tbody.appendChild(tr);
                         }
                         const tfoot = document.getElementById("totals");
@@ -294,6 +302,10 @@
                             "<td>" + formatTime(totalTime) + "</td>" +
                             "<td>" + totalDist.toLocaleString(undefined, {minimumFractionDigits: 1, maximumFractionDigits: 1}) + "</td>" +
                             "<td>" + Math.round(totalElev).toLocaleString() + "</td>" +
+                            "<td></td>" +
+                            "<td></td>" +
+                            "<td>" + (totalDist * 0.621371).toLocaleString(undefined, {minimumFractionDigits: 1, maximumFractionDigits: 1}) + "</td>" +
+                            "<td>" + Math.round(totalElev * 3.28084).toLocaleString() + "</td>" +
                             "<td></td>" +
                             "<td></td>";
                         tfoot.appendChild(tfootRow);
@@ -307,7 +319,11 @@
                             "<td>" + (totalDist / effectiveYears).toLocaleString(undefined, {minimumFractionDigits: 1, maximumFractionDigits: 1}) + "</td>" +
                             "<td>" + Math.round(totalElev / effectiveYears).toLocaleString() + "</td>" +
                             "<td class='fg-green'>" + (totalDist / totalWeeks).toFixed(1) + "</td>" +
-                            "<td class='fg-purple'>" + Math.round(totalElev / totalWeeks).toLocaleString() + "</td>";
+                            "<td class='fg-purple'>" + Math.round(totalElev / totalWeeks).toLocaleString() + "</td>" +
+                            "<td>" + (totalDist * 0.621371 / effectiveYears).toLocaleString(undefined, {minimumFractionDigits: 1, maximumFractionDigits: 1}) + "</td>" +
+                            "<td>" + Math.round(totalElev * 3.28084 / effectiveYears).toLocaleString() + "</td>" +
+                            "<td>" + (totalDist * 0.621371 / totalWeeks).toFixed(1) + "</td>" +
+                            "<td>" + Math.round(totalElev * 3.28084 / totalWeeks).toLocaleString() + "</td>";
                         tfoot.appendChild(avgRow);
                         var selectedIndex = -1;
                         var rows = tbody.querySelectorAll("tr");

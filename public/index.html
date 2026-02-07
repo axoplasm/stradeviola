@@ -136,6 +136,9 @@
                 <tfoot id="totals"></tfoot>
             </table>
             <script>
+                const KM_TO_MI = 0.621371;
+                const M_TO_FT = 3.28084;
+
                 function formatTime(seconds) {
                     const h = Math.floor(seconds / 3600);
                     const m = Math.floor((seconds % 3600) / 60);
@@ -295,10 +298,10 @@
                                 "<td>" + Math.round(y.elevation).toLocaleString() + "</td>" +
                                 "<td class='fg-green'>" + (y.distance / weeks).toFixed(1) + "</td>" +
                                 "<td class='fg-purple'>" + Math.round(y.elevation / weeks).toLocaleString() + "</td>" +
-                                "<td>" + (y.distance * 0.621371).toLocaleString(undefined, {minimumFractionDigits: 1, maximumFractionDigits: 1}) + "</td>" +
-                                "<td>" + Math.round(y.elevation * 3.28084).toLocaleString() + "</td>" +
-                                "<td>" + (y.distance * 0.621371 / weeks).toFixed(1) + "</td>" +
-                                "<td>" + Math.round(y.elevation * 3.28084 / weeks).toLocaleString() + "</td>";
+                                "<td>" + (y.distance * KM_TO_MI).toLocaleString(undefined, {minimumFractionDigits: 1, maximumFractionDigits: 1}) + "</td>" +
+                                "<td>" + Math.round(y.elevation * M_TO_FT).toLocaleString() + "</td>" +
+                                "<td>" + (y.distance * KM_TO_MI / weeks).toFixed(1) + "</td>" +
+                                "<td>" + Math.round(y.elevation * M_TO_FT / weeks).toLocaleString() + "</td>";
                             tbody.appendChild(tr);
                         }
                         const tfoot = document.getElementById("totals");
@@ -311,8 +314,8 @@
                             "<td>" + Math.round(totalElev).toLocaleString() + "</td>" +
                             "<td></td>" +
                             "<td></td>" +
-                            "<td>" + (totalDist * 0.621371).toLocaleString(undefined, {minimumFractionDigits: 1, maximumFractionDigits: 1}) + "</td>" +
-                            "<td>" + Math.round(totalElev * 3.28084).toLocaleString() + "</td>" +
+                            "<td>" + (totalDist * KM_TO_MI).toLocaleString(undefined, {minimumFractionDigits: 1, maximumFractionDigits: 1}) + "</td>" +
+                            "<td>" + Math.round(totalElev * M_TO_FT).toLocaleString() + "</td>" +
                             "<td></td>" +
                             "<td></td>";
                         tfoot.appendChild(tfootRow);
@@ -327,10 +330,10 @@
                             "<td>" + Math.round(totalElev / effectiveYears).toLocaleString() + "</td>" +
                             "<td class='fg-green'>" + (totalDist / totalWeeks).toFixed(1) + "</td>" +
                             "<td class='fg-purple'>" + Math.round(totalElev / totalWeeks).toLocaleString() + "</td>" +
-                            "<td>" + (totalDist * 0.621371 / effectiveYears).toLocaleString(undefined, {minimumFractionDigits: 1, maximumFractionDigits: 1}) + "</td>" +
-                            "<td>" + Math.round(totalElev * 3.28084 / effectiveYears).toLocaleString() + "</td>" +
-                            "<td>" + (totalDist * 0.621371 / totalWeeks).toFixed(1) + "</td>" +
-                            "<td>" + Math.round(totalElev * 3.28084 / totalWeeks).toLocaleString() + "</td>";
+                            "<td>" + (totalDist * KM_TO_MI / effectiveYears).toLocaleString(undefined, {minimumFractionDigits: 1, maximumFractionDigits: 1}) + "</td>" +
+                            "<td>" + Math.round(totalElev * M_TO_FT / effectiveYears).toLocaleString() + "</td>" +
+                            "<td>" + (totalDist * KM_TO_MI / totalWeeks).toFixed(1) + "</td>" +
+                            "<td>" + Math.round(totalElev * M_TO_FT / totalWeeks).toLocaleString() + "</td>";
                         tfoot.appendChild(avgRow);
                         var selectedIndex = -1;
                         var rows = tbody.querySelectorAll("tr");

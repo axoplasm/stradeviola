@@ -11,7 +11,7 @@ load_dotenv()
 
 CLIENT_ID = int(os.environ["STRAVA_CLIENT_ID"])
 CLIENT_SECRET = os.environ["STRAVA_CLIENT_SECRET"]
-REDIRECT_URI = "http://localhost:8000/callback"
+REDIRECT_URI = "https://stradeviola.axoplasm.com/callback"
 TOKEN_FILE = Path(__file__).parent / ".tokens.json"
 
 

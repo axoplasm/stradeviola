@@ -145,10 +145,14 @@
                     return h + "<span class='fg-whisper'>h</span>" + String(m).padStart(2, "0") + "<span class='fg-whisper'>m</span>";
                 }
 
+                function isLeapYear(yr) {
+                    return (yr % 4 === 0 && yr % 100 !== 0) || yr % 400 === 0;
+                }
+
                 function weeksInYear(year) {
                     const now = new Date();
                     const yr = parseInt(year);
-                    if (yr < now.getFullYear()) return 52;
+                    if (yr < now.getFullYear()) return (isLeapYear(yr) ? 366 : 365) / 7;
                     const start = new Date(yr, 0, 1);
                     return Math.max(1, (now - start) / (7 * 24 * 60 * 60 * 1000));
                 }

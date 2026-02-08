@@ -309,6 +309,8 @@
                     .then(res => res.json())
                     .then(data => {
                         const tbody = document.getElementById("stats");
+                        
+                        // Remove any years with partial data:
                         delete data["2011"];
                         const years = Object.keys(data).sort((a, b) => a - b);
                         const avgKmPerWk = [];

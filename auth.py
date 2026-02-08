@@ -18,16 +18,24 @@ TOKEN_FILE = Path(__file__).parent / ".tokens.json"
 
 
 def save_tokens(token_data: dict) -> None:
+    """Writes token data (access_token, refresh_token, expires_at) to .tokens.json."""
     TOKEN_FILE.write_text(json.dumps(token_data, indent=2))
 
 
 def load_tokens() -> dict | None:
+    """Loads saved tokens from .tokens.json, or return None if the file doesn't exist."""
     if TOKEN_FILE.exists():
         return json.loads(TOKEN_FILE.read_text())
     return None
 
 
 def authorize_via_browser(client: Client) -> dict:
+    """Runs the Strava OAuth flow interactively.
+
+    Opens the authorization URL in a browser and starts a local HTTP server
+    on port 8000 to receive the callback. Exchanges the authorization code
+    for access and refresh tokens, saves them, and returns the token dict.
+    """
     auth_url = client.authorization_url(
         client_id=CLIENT_ID,
         redirect_uri=REDIRECT_URI,
@@ -71,6 +79,11 @@ def authorize_via_browser(client: Client) -> dict:
 
 
 def get_authenticated_client() -> Client:
+    """Returns a stravalib Client with a valid access token.
+
+    Tries, in order: reuse a non-expired saved token, refresh an expired
+    token, or run the full OAuth browser flow. Saves fresh tokens to disk.
+    """
     client = Client()
     tokens = load_tokens()
 

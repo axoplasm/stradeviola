@@ -1,4 +1,4 @@
-# stradeviola
+# Strade Viola
 
 A static dashboard showing yearly cycling stats from Strava. Fetches ride data via the Strava API, aggregates it by year, and generates a single-page HTML dashboard with an interactive chart and table (metric and US units).
 
@@ -45,13 +45,16 @@ python -m http.server -d public
 - `main.py` — CLI script that prints recent activities
 - `public/index.html` — Static dashboard with interactive chart and table
 - `public/data.json` — Generated data file (not checked in)
+- `.env` — Environment variables (not checked in). See __Setup__, above
+- `.tokens.json` — Local copy of auth token (not checked in)
+- `public/css/*` — reference css files. Selectors from these files can be copied into the `<style>` tag in `index.html`
 
 ## Cron
 
-To keep the data fresh on a server, run `build_site.py` periodically:
+To keep the data fresh on a server, run `build_site.py` periodically, for example with a cron job that executes every 6 hours:
 
 ```
-0 */6 * * * cd /path/to/stradeviola && /path/to/stradeviola/venv/bin/python build_site.py >> /var/log/stradeviola.log 2>&1
+0 */6 * * * /path/to/stradeviola/venv/bin/python /path/to/stradeviola/build_site.py >> /var/log/stradeviola.log 2>&1
 ```
 
 The initial OAuth flow must be done interactively. After that, token refresh is automatic.

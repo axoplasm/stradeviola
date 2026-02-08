@@ -48,6 +48,8 @@
                 --bold-weight: 600;
                 --border-width: 1px;
                 --grid: 1rem;
+                --transition-speed: 0.2s;
+                --transition-timing-function: ease-in-out;
                 font-size: var(--default-font-size);
                 height: 100%;
                 scroll-behavior: smooth;
@@ -56,7 +58,7 @@
                 background: var(--silent);
                 color: var(--loud);
                 container-type: inline-size;
-                font-family: var(--serif);
+                font-family: var(--monospace);
                 height: 100%;
                 line-height: var(--default-line-height);
             }
@@ -66,7 +68,6 @@
                 padding-inline: 1rem;
             }
             h1 {
-                font-family: var(--monospace);
                 font-weight: var(--bold-weight);
                 margin-block-end: var(--grid);
                 font-size: 2rem;
@@ -74,7 +75,6 @@
             table {
                 border-collapse: collapse;
                 border: var(--border-width) solid var(--hushed);
-                font-family: var(--monospace);
                 margin-block: var(--grid);
                 margin-inline: auto;
                 text-align: right;
@@ -103,6 +103,18 @@
                 border-inline-start: var(--border-width) solid var(--whisper);
             }
 
+            a {
+                text-decoration: underline;
+                text-decoration-style: solid;
+                transition: color 0.2s ease-in-out;
+                &:hover {
+                    color: var(--purple);
+                }
+            }
+            strong {
+                font-weight: bold;
+            }
+
             #chart {
                 --chart-km: var(--green);
                 --chart-elev: var(--purple);
@@ -112,7 +124,7 @@
             }
 
             /* Local */
-            .center { text-align: center; }
+            .align-center { text-align: center; }
             .fg-green { color: var(--green); }
             .fg-purple { color: var(--purple); }
             .fg-whisper { color: var(--whisper); }
@@ -121,7 +133,7 @@
     </head>
     <body>
         <main>
-            <h1 class="center">🚴<span class="fg-green">strade</span><span class="fg-purple">viola</span>😈‍</h1>
+            <h1 class="align-center">🚴<span class="fg-green">strade</span><span class="fg-purple">viola</span>😈‍</h1>
             <canvas id="chart" style="width:100%"></canvas>
             <table>
                 <colgroup span="3"></colgroup>
@@ -145,6 +157,7 @@
                 <tbody id="stats"></tbody>
                 <tfoot id="totals"></tfoot>
             </table>
+            <p class="align-center"><strong><a href="https://github.com/axoplasm/stradeviola">Project on GitHub →</a></strong></p>
             <script>
                 const KM_TO_MI = 0.621371;
                 const M_TO_FT = 3.28084;

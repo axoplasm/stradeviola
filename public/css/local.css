@@ -1,0 +1,45 @@
+/* Local stylesheet contains only classes and provides special behaviors */
+.center {
+    text-align: center;
+}
+.main-nav {
+    margin-inline: auto;
+    max-width: 50rem;
+    padding-inline: 1rem;
+    menu {
+        column-gap: 1em;
+        display: flex;
+        flex-wrap: wrap;
+        li {
+            white-space: nowrap;
+        }
+    }
+}
+
+/* Stylesheet colors */
+.fg-red { color: var(--red); }
+.fg-orange { color: var(--orange); }
+.fg-yellow { color: var(--yellow); }
+.fg-green { color: var(--green); }
+.fg-blue { color: var(--blue); }
+.fg-purple { color: var(--purple); }
+.fg-black { color: var(--black); }
+.fg-white { color: var(--white); }
+.fg-loud { color: var(--loud); }
+.fg-hushed { color: var(--hushed); }
+.fg-whisper { color: var(--whisper); }
+.fg-quiet { color: var(--quiet); }
+.fg-silent { color: var(--silent); }
+.bg-red { background-color: var(--red); }
+.bg-orange { background-color: var(--orange); }
+.bg-yellow { background-color: var(--yellow); }
+.bg-green { background-color: var(--green); }
+.bg-blue { background-color: var(--blue); }
+.bg-purple { background-color: var(--purple); }
+.bg-black { background-color: var(--black); }
+.bg-white { background-color: var(--white); }
+.bg-loud { background-color: var(--loud); }
+.bg-hushed { background-color: var(--hushed); }
+.bg-whisper { background-color: var(--whisper); }
+.bg-quiet { background-color: var(--quiet); }
+.bg-silent { background-color: var(--silent); }

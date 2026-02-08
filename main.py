@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+'''
+Test script that authenticates to Strava API and returns the 10 most recent 
+cycling activities.
+'''
 from auth import get_authenticated_client
 
 client = get_authenticated_client()

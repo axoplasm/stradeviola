@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+'''Fetches activities from Strava API and updates data.json.'''
 import json
 from collections import defaultdict
 from datetime import datetime
@@ -11,6 +12,11 @@ DATA_FILE = Path(__file__).parent / "public" / "data.json"
 
 
 def aggregate(activities):
+    """
+    Aggregates ride activities by year, summing count, moving time, distance (km), and elevation (m).
+
+    Non-ride activity types are ignored. Returns a dict keyed by year string.
+    """
     data = defaultdict(lambda: {"count": 0, "time": 0, "distance": 0.0, "elevation": 0.0})
     for a in activities:
         if a.type and a.type.root in RIDE_TYPES:
@@ -24,6 +30,12 @@ def aggregate(activities):
 
 
 def update_data():
+    """
+    Creates or updates public/data.json with yearly ride stats from Strava.
+
+    If data.json already exists, fetches only the current year's activities
+    and updates that entry. Otherwise fetches all activities and creates the file.
+    """
     client = get_authenticated_client()
     current_year = str(datetime.now().year)
 

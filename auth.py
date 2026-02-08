@@ -1,3 +1,4 @@
+'''Library of helper functions for authentication to Strava API.'''
 import json
 import os
 import time

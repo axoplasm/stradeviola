@@ -101,6 +101,14 @@
                 border-inline: var(--border-width) solid var(--whisper);
             }
 
+            #chart {
+                --chart-km: var(--green);
+                --chart-elev: var(--purple);
+                --chart-grid: var(--whisper);
+                --chart-label: var(--hushed);
+                --chart-bg: var(--silent);
+            }
+
             /* Local */
             .center { text-align: center; }
             .fg-green { color: var(--green); }
@@ -139,6 +147,10 @@
                 const KM_TO_MI = 0.621371;
                 const M_TO_FT = 3.28084;
 
+                const chartRule = [...document.styleSheets[0].cssRules].find(r => r.selectorText === "#chart");
+                for (const name of chartRule.style)
+                    CSS.registerProperty({name, syntax: "<color>", inherits: false, initialValue: "black"});
+
                 function formatTime(seconds) {
                     const h = Math.floor(seconds / 3600);
                     const m = Math.floor((seconds % 3600) / 60);
@@ -161,6 +173,7 @@
                     const canvas = document.getElementById("chart");
                     const ctx = canvas.getContext("2d");
                     const dpr = window.devicePixelRatio || 1;
+                    const styles = getComputedStyle(canvas);
 
                     const cssWidth = canvas.clientWidth;
                     const cssHeight = 300;
@@ -169,8 +182,11 @@
                     canvas.height = cssHeight * dpr;
                     ctx.scale(dpr, dpr);
 
-                    const kmColor = "hsl(120, 100%, 30%)";
-                    const elevColor = "hsl(300, 100%, 35%)";
+                    const kmColor = styles.getPropertyValue("--chart-km");
+                    const elevColor = styles.getPropertyValue("--chart-elev");
+                    const gridColor = styles.getPropertyValue("--chart-grid");
+                    const labelColor = styles.getPropertyValue("--chart-label");
+                    const bgColor = styles.getPropertyValue("--chart-bg");
                     const narrow = cssWidth < 700;
                     const pad = {top: 24, right: 65, bottom: narrow ? 70 : 46, left: 58};
                     const w = cssWidth - pad.left - pad.right;
@@ -189,7 +205,7 @@
                     for (let i = 0; i <= steps; i++) {
                         const val = (maxKm / steps) * i;
                         const y = pad.top + h - (h * val / maxKm);
-                        ctx.strokeStyle = "#e0e0e0";
+                        ctx.strokeStyle = gridColor;
                         ctx.beginPath();
                         ctx.moveTo(pad.left, y);
                         ctx.lineTo(pad.left + w, y);
@@ -226,7 +242,7 @@
                     ctx.restore();
 
                     // X labels
-                    ctx.fillStyle = "#666";
+                    ctx.fillStyle = labelColor;
                     for (let i = 0; i < n; i++) {
                         const x = pad.left + (w / (n - 1)) * i;
                         ctx.save();
@@ -259,7 +275,7 @@
                             if (highlightIndex >= 0 && i === highlightIndex) {
                                 ctx.arc(x, y, 8, 0, Math.PI * 2);
                                 ctx.fill();
-                                ctx.strokeStyle = "#fff";
+                                ctx.strokeStyle = bgColor;
                                 ctx.lineWidth = 2;
                                 ctx.setLineDash([]);
                                 ctx.stroke();

@@ -1,6 +1,8 @@
 # Strade Viola
 
-A static dashboard showing yearly cycling stats from Strava. Fetches ride data via the Strava API, aggregates it by year, and generates a single-page HTML dashboard with an interactive chart and table (metric and US units).
+A static dashboard showing yearly cycling stats from Strava. Fetches ride data via the Strava API, aggregates it by year, and generates a single-page HTML dashboard with an interactive chart and table in metric and US units.
+
+See an example using [axoplasm’s](https://www.strava.com/athletes/56063) data at [stradeviola.axoplasm.com](https://stradeviola.axoplasm.com).
 
 ## Setup
 
@@ -15,16 +17,21 @@ A static dashboard showing yearly cycling stats from Strava. Fetches ride data v
 
 3. Install dependencies:
 
+   ```bash
+   $ python3 -m venv venv
+   $ source venv/bin/activate
+   (venv) $ pip install -r requirements.txt
    ```
-   python3 -m venv venv
-   source venv/bin/activate
-   pip install -r requirements.txt
+
+3. Test the connection to the API by running `main.py`. This will fetch the 10 most recent cycling activities in your Strava profile.
+   ```bash
+   (venv) $ python main.py
    ```
 
 4. Run the build script. On first run it will open a browser for Strava OAuth, then fetch all activities:
 
-   ```
-   python build_site.py
+   ```bash
+   (venv) $ python build_site.py
    ```
 
    On subsequent runs it only fetches the current year's activities and updates `public/data.json` if anything changed.
@@ -33,8 +40,8 @@ A static dashboard showing yearly cycling stats from Strava. Fetches ride data v
 
 Serve the `public/` directory with any static file server. For example:
 
-```
-python -m http.server -d public
+```bash
+(venv) python -m http.server -d public
 ```
 
 ## Files

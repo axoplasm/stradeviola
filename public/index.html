@@ -159,23 +159,36 @@
             </table>
             <p class="align-center"><strong><a href="https://github.com/axoplasm/stradeviola">Project on GitHub →</a></strong></p>
             <script>
+                // -- Constants --
+
                 const KM_TO_MI = 0.621371;
                 const M_TO_FT = 3.28084;
 
+                // Register --chart-* CSS custom properties as <color> so that
+                // getComputedStyle resolves light-dark() to actual rgb values
+                // that the canvas API can use. Property names are read from the
+                // #chart rule in the stylesheet so they stay in sync with CSS.
                 const chartRule = [...document.styleSheets[0].cssRules].find(r => r.selectorText === "#chart");
                 for (const name of chartRule.style)
                     CSS.registerProperty({name, syntax: "<color>", inherits: false, initialValue: "black"});
 
+                // -- Helpers --
+
+                // Format seconds as "Nh00m" with dimmed unit labels.
                 function formatTime(seconds) {
                     const h = Math.floor(seconds / 3600);
                     const m = Math.floor((seconds % 3600) / 60);
                     return h + "<span class='fg-whisper'>h</span>" + String(m).padStart(2, "0") + "<span class='fg-whisper'>m</span>";
                 }
 
+                // Return true if the given year is a leap year.
                 function isLeapYear(yr) {
                     return (yr % 4 === 0 && yr % 100 !== 0) || yr % 400 === 0;
                 }
 
+                // Number of weeks in a year. For past years, uses actual days
+                // (365 or 366) divided by 7. For the current year, uses elapsed
+                // time so that per-week averages reflect the year so far.
                 function weeksInYear(year) {
                     const now = new Date();
                     const yr = parseInt(year);
@@ -184,6 +197,12 @@
                     return Math.max(1, (now - start) / (7 * 24 * 60 * 60 * 1000));
                 }
 
+                // -- Chart --
+
+                // Draw a dual-axis line chart on the #chart canvas.
+                // Left axis: km/wk (solid line). Right axis: m/wk (dashed line).
+                // Colors are read from resolved --chart-* CSS custom properties.
+                // Clicking a data point (or table row) highlights it.
                 function drawChart(years, avgKmPerWk, avgMPerWk, highlightIndex) {
                     const canvas = document.getElementById("chart");
                     const ctx = canvas.getContext("2d");
@@ -269,6 +288,8 @@
                         ctx.restore();
                     }
 
+                    // Plot a single data series as a line with dots.
+                    // The highlighted point (if any) gets a larger dot with a ring.
                     function drawLine(values, maxVal, color, dashed) {
                         ctx.beginPath();
                         ctx.strokeStyle = color;
@@ -305,6 +326,11 @@
                     drawLine(avgMPerWk, maxElev, elevColor, true);
                 }
 
+                // -- Data loading and table rendering --
+
+                // Fetch yearly stats, populate the table (per-year rows, totals,
+                // averages), draw the chart, and wire up click-to-highlight
+                // interaction between the table rows and chart data points.
                 fetch("/data.json")
                     .then(res => res.json())
                     .then(data => {
@@ -372,6 +398,9 @@
                             "<td>" + (totalDist * KM_TO_MI / totalWeeks).toFixed(1) + "</td>" +
                             "<td>" + Math.round(totalElev * M_TO_FT / totalWeeks).toLocaleString() + "</td>";
                         tfoot.appendChild(avgRow);
+                        // Click-to-highlight: clicking a table row or chart
+                        // point highlights that year in both the table and chart.
+                        // Clicking the same year again deselects it.
                         var selectedIndex = -1;
                         var rows = tbody.querySelectorAll("tr");
                         function selectYear(idx) {
@@ -398,6 +427,8 @@
                             if (idx >= 0 && idx < n) selectYear(idx);
                         });
                         drawChart(years, avgKmPerWk, avgMPerWk, selectedIndex);
+
+                        // Redraw the chart on window resize (debounced).
                         let resizeTimer;
                         window.addEventListener("resize", function () {
                             clearTimeout(resizeTimer);

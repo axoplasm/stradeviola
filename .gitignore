@@ -1,9 +1,35 @@
+# OS generated files
+.DS_Store
+ehthumbs.db
+Icon?
+Thumbs.db
+._*
+
+# Python bytecode
+__pycache__/
+*.pyc
+
+# Python environment
+venv/
+
+# Local secrets
+.env
+.tokens.json
+.htpasswd
+
+# Editor tmpfiles
 *.swp
 *.swo
-.claude
-.env
-venv
-.tokens.json
-*.pyc
-__pycache__
+*.un~
+*~
+
+# Local tooling
+.claude/
+.idea/
+.vscode/
+.nova/
+.ycm_extra_conf.py
+
+# User-generated data
 data.json
+

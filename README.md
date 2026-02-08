@@ -58,10 +58,10 @@ Serve the `public/` directory with any static file server. For example:
 
 ## Cron
 
-To keep the data fresh on a server, run `build_site.py` periodically, for example with a cron job that executes every 6 hours:
+To keep the data fresh on a server, run `build_site.py` periodically, for example with a cron job that executes every hour:
 
 ```
-0 */6 * * * /path/to/stradeviola/venv/bin/python /path/to/stradeviola/build_site.py >> /var/log/stradeviola.log 2>&1
+0 * * * * /path/to/stradeviola/venv/bin/python /path/to/stradeviola/build_site.py >> /var/log/stradeviola.log 2>&1
 ```
 
 The initial OAuth flow must be done interactively. After that, token refresh is automatic.

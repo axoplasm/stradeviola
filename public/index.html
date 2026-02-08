@@ -3,7 +3,7 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>🚴stradeviola😈‍</title>
+        <title>Strade Viola‍</title>
         <link rel="icon" href="favicon.svg">
         <style>
             /* Reset */
@@ -78,18 +78,20 @@
                 margin-block: var(--grid);
                 margin-inline: auto;
                 text-align: right;
+                display: block;
+                max-width: 100%;
+                overflow-x: auto;
+                width: fit-content;
             }
             thead, tfoot {
                 background-color: var(--quiet);
                 font-weight: var(--bold-weight);
             }
             thead {
-                border-block-start: var(--border-width) solid var(--hushed);
                 border-block-end: var(--border-width) solid var(--whisper);
             }
             tfoot {
                 border-block-start: var(--border-width) solid var(--whisper);
-                border-block-end: var(--border-width) solid var(--hushed);
             }
             td, th {
                 padding-block: calc(var(--grid) * 0.25);
@@ -104,17 +106,31 @@
             }
 
             a {
-                text-decoration: underline;
-                text-decoration-style: solid;
-                transition: color 0.2s ease-in-out;
+                text-decoration: none;
+                transition: all 0.2s ease-in-out;
+                &:link, &:visited {
+                    background-color: transparent;
+                    border: 2px solid var(--green);
+                    color: var(--green);
+                    padding: 5px;
+                }
                 &:hover {
-                    color: var(--purple);
+                    background-color: var(--purple);
+                    border-color: var(--purple);
+                    color: var(--silent);
+                    padding: 9px;
                 }
             }
+
             strong {
                 font-weight: bold;
             }
 
+            @media (max-width: 799px) {
+                html { --default-font-size: 12px; }
+            }
+
+            /* Local */
             #chart {
                 --chart-km: var(--green);
                 --chart-elev: var(--purple);
@@ -122,18 +138,29 @@
                 --chart-label: var(--hushed);
                 --chart-bg: var(--silent);
             }
-
-            /* Local */
             .align-center { text-align: center; }
             .fg-green { color: var(--green); }
             .fg-purple { color: var(--purple); }
             .fg-whisper { color: var(--whisper); }
             .bg-quiet { background-color: var(--quiet); }
+            .🚴, .😈 {
+                display: inline-block;
+            }
+            .🚴 {
+                padding-inline-start: 1rem;
+                transform: rotate(-30deg) scaleX(-1);
+            }
+            .😈 {
+                padding-inline-start: 0.5rem;
+                transform: rotate(30deg);
+            }
         </style>
     </head>
     <body>
         <main>
-            <h1 class="align-center">🚴<span class="fg-green">strade</span><span class="fg-purple">viola</span>😈‍</h1>
+            <h1 class="align-center">
+                <span class="🚴">🚴</span><span class="fg-green">Strade</span><span class="fg-purple">Viola</span><span class="😈">😈</span>
+            </h1>
             <canvas id="chart" style="width:100%"></canvas>
             <table>
                 <colgroup span="3"></colgroup>
@@ -230,7 +257,7 @@
                     const maxKm = Math.ceil(Math.max(...avgKmPerWk) / 25) * 25;
                     const maxElev = Math.ceil(Math.max(...avgMPerWk) / 500) * 500;
 
-                    ctx.font = "14px 'IBM Plex Mono', monospace";
+                    ctx.font = styles.getPropertyValue("--default-font-size") + " " + styles.getPropertyValue("--monospace");
 
                     // Y gridlines (left axis)
                     ctx.textAlign = "right";
@@ -281,7 +308,7 @@
                         const x = pad.left + (w / (n - 1)) * i;
                         ctx.save();
                         ctx.translate(x, pad.top + h + 8);
-                        ctx.rotate(-Math.PI / 4);
+                        ctx.rotate(-Math.PI / 3);
                         ctx.textAlign = "right";
                         ctx.textBaseline = "middle";
                         ctx.fillText(years[i], 0, 0);

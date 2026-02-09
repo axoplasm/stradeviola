@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 '''Fetches activities from Strava API and updates data.json.'''
 import json
+import time
 from collections import defaultdict
 from datetime import datetime
 from pathlib import Path
 
-from auth import get_authenticated_client
+from auth import get_authenticated_client, load_tokens, refresh_local_tokens
 
 RIDE_TYPES = {"Ride", "VirtualRide", "EBikeRide"}
 DATA_FILE = Path(__file__).parent / "public" / "data.json"
@@ -36,6 +37,9 @@ def update_data():
     If data.json already exists, fetches only the current year's activities
     and updates that entry. Otherwise fetches all activities and creates the file.
     """
+    tokens = load_tokens()
+    if tokens and tokens.get("refresh_token") and tokens["expires_at"] <= time.time():
+        refresh_local_tokens()
     client = get_authenticated_client()
     current_year = str(datetime.now().year)
 

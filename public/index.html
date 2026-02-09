@@ -137,6 +137,27 @@
                 --chart-grid: var(--whisper);
                 --chart-label: var(--hushed);
                 --chart-bg: var(--silent);
+                width: 100%;
+                height: 300px;
+                cursor: pointer;
+                font-family: var(--monospace);
+                font-size: var(--default-font-size);
+                & text { dominant-baseline: middle; }
+                .grid { stroke: var(--chart-grid); }
+                .label-left, .title-left { fill: var(--chart-km); }
+                .label-right, .title-right { fill: var(--chart-elev); }
+                .label-left { text-anchor: end; }
+                .label-right { text-anchor: start; }
+                .title-left, .title-right { text-anchor: middle; }
+                .label-x { fill: var(--chart-label); text-anchor: end; }
+                .series-km { fill: none; stroke: var(--chart-km); stroke-width: 2; }
+                .series-elev { fill: none; stroke: var(--chart-elev); stroke-width: 2; stroke-dasharray: 2 2; }
+                .avg-km { stroke: var(--chart-km); }
+                .avg-elev { stroke: var(--chart-elev); stroke-dasharray: 2 2; }
+                .dot-km { fill: var(--chart-km); }
+                .dot-elev { fill: var(--chart-elev); }
+                .highlight { stroke: var(--chart-bg); stroke-width: 2; }
+                .hit { fill: transparent; }
             }
             .align-center { text-align: center; }
             .fg-green { color: var(--green); }
@@ -161,7 +182,7 @@
             <h1 class="align-center">
                 <span class="🚴">🚴</span><span class="fg-green">Strade</span><span class="fg-purple">Viola</span><span class="😈">😈</span>
             </h1>
-            <canvas id="chart" style="width:100%"></canvas>
+            <svg id="chart"></svg>
             <table>
                 <colgroup span="3"></colgroup>
                 <colgroup span="4"></colgroup>
@@ -191,14 +212,6 @@
                 const KM_TO_MI = 0.621371;
                 const M_TO_FT = 3.28084;
 
-                // Register --chart-* CSS custom properties as <color> so that
-                // getComputedStyle resolves light-dark() to actual rgb values
-                // that the canvas API can use. Property names are read from the
-                // #chart rule in the stylesheet so they stay in sync with CSS.
-                const chartRule = [...document.styleSheets[0].cssRules].find(r => r.selectorText === "#chart");
-                for (const name of chartRule.style)
-                    CSS.registerProperty({name, syntax: "<color>", inherits: false, initialValue: "black"});
-
                 // -- Helpers --
 
                 // Format seconds as "Nh00m" with dimmed unit labels.
@@ -226,28 +239,14 @@
 
                 // -- Chart --
 
-                // Draw a dual-axis line chart on the #chart canvas.
+                // Builds a dual-axis line chart as SVG markup.
                 // Left axis: km/wk (solid line). Right axis: m/wk (dashed line).
-                // Colors are read from resolved --chart-* CSS custom properties.
+                // Colors and styles are applied via CSS on #chart descendants.
                 // Clicking a data point (or table row) highlights it.
                 function drawChart(years, avgKmPerWk, avgMPerWk, highlightIndex, avgKm, avgM) {
-                    const canvas = document.getElementById("chart");
-                    const ctx = canvas.getContext("2d");
-                    const dpr = window.devicePixelRatio || 1;
-                    const styles = getComputedStyle(canvas);
-
-                    const cssWidth = canvas.clientWidth;
+                    const svg = document.getElementById("chart");
+                    const cssWidth = svg.clientWidth;
                     const cssHeight = 300;
-                    canvas.style.height = cssHeight + "px";
-                    canvas.width = cssWidth * dpr;
-                    canvas.height = cssHeight * dpr;
-                    ctx.scale(dpr, dpr);
-
-                    const kmColor = styles.getPropertyValue("--chart-km");
-                    const elevColor = styles.getPropertyValue("--chart-elev");
-                    const gridColor = styles.getPropertyValue("--chart-grid");
-                    const labelColor = styles.getPropertyValue("--chart-label");
-                    const bgColor = styles.getPropertyValue("--chart-bg");
                     const narrow = cssWidth < 700;
                     const pad = {top: 24, right: 65, bottom: narrow ? 70 : 46, left: 58};
                     const w = cssWidth - pad.left - pad.right;
@@ -256,126 +255,66 @@
 
                     const maxKm = Math.ceil(Math.max(...avgKmPerWk) / 25) * 25;
                     const maxElev = Math.ceil(Math.max(...avgMPerWk) / 500) * 500;
-
-                    ctx.font = styles.getPropertyValue("--default-font-size") + " " + styles.getPropertyValue("--monospace");
-
-                    // Y gridlines (left axis)
-                    ctx.textAlign = "right";
-                    ctx.textBaseline = "middle";
                     const steps = 5;
+
+                    const yKm = v => pad.top + h - (h * v / maxKm);
+                    const yElev = v => pad.top + h - (h * v / maxElev);
+                    const xAt = i => pad.left + (w / (n - 1)) * i;
+
+                    const parts = [];
+
+                    // Gridlines + left axis labels
                     for (let i = 0; i <= steps; i++) {
                         const val = (maxKm / steps) * i;
-                        const y = pad.top + h - (h * val / maxKm);
-                        ctx.strokeStyle = gridColor;
-                        ctx.beginPath();
-                        ctx.moveTo(pad.left, y);
-                        ctx.lineTo(pad.left + w, y);
-                        ctx.stroke();
-                        ctx.fillStyle = kmColor;
-                        ctx.fillText(Math.round(val), pad.left - 8, y);
+                        const y = yKm(val);
+                        parts.push(`<line class="grid" x1="${pad.left}" y1="${y}" x2="${pad.left + w}" y2="${y}" />`);
+                        parts.push(`<text class="label-left" x="${pad.left - 8}" y="${y}">${Math.round(val)}</text>`);
                     }
 
                     // Right axis labels
-                    ctx.textAlign = "left";
                     for (let i = 0; i <= steps; i++) {
                         const val = (maxElev / steps) * i;
-                        const y = pad.top + h - (h * val / maxElev);
-                        ctx.fillStyle = elevColor;
-                        ctx.fillText(Math.round(val).toLocaleString(), pad.left + w + 8, y);
+                        parts.push(`<text class="label-right" x="${pad.left + w + 8}" y="${yElev(val)}">${Math.round(val).toLocaleString()}</text>`);
                     }
 
-                    // Left Y axis label
-                    ctx.save();
-                    ctx.translate(14, pad.top + h / 2);
-                    ctx.rotate(-Math.PI / 2);
-                    ctx.textAlign = "center";
-                    ctx.fillStyle = kmColor;
-                    ctx.fillText("km/wk", 0, 0);
-                    ctx.restore();
+                    // Axis titles
+                    parts.push(`<text class="title-left" transform="translate(14,${pad.top + h / 2}) rotate(-90)">km/wk</text>`);
+                    parts.push(`<text class="title-right" transform="translate(${cssWidth - 6},${pad.top + h / 2}) rotate(90)">m/wk</text>`);
 
-                    // Right Y axis label
-                    ctx.save();
-                    ctx.translate(cssWidth - 6, pad.top + h / 2);
-                    ctx.rotate(Math.PI / 2);
-                    ctx.textAlign = "center";
-                    ctx.fillStyle = elevColor;
-                    ctx.fillText("m/wk", 0, 0);
-                    ctx.restore();
+                    // X axis labels
+                    for (let i = 0; i < n; i++)
+                        parts.push(`<text class="label-x" transform="translate(${xAt(i)},${pad.top + h + 8}) rotate(-60)">${years[i]}</text>`);
 
-                    // X labels
-                    ctx.fillStyle = labelColor;
+                    // Data series
+                    parts.push(`<polyline class="series-km" points="${avgKmPerWk.map((v, i) => `${xAt(i)},${yKm(v)}`).join(" ")}" />`);
+                    parts.push(`<polyline class="series-elev" points="${avgMPerWk.map((v, i) => `${xAt(i)},${yElev(v)}`).join(" ")}" />`);
+
+                    // Average reference lines
+                    if (avgKm != null)
+                        parts.push(`<line class="avg-km" x1="${pad.left}" y1="${yKm(avgKm)}" x2="${pad.left + w}" y2="${yKm(avgKm)}" />`);
+                    if (avgM != null)
+                        parts.push(`<line class="avg-elev" x1="${pad.left}" y1="${yElev(avgM)}" x2="${pad.left + w}" y2="${yElev(avgM)}" />`);
+
+                    // Data points
                     for (let i = 0; i < n; i++) {
-                        const x = pad.left + (w / (n - 1)) * i;
-                        ctx.save();
-                        ctx.translate(x, pad.top + h + 8);
-                        ctx.rotate(-Math.PI / 3);
-                        ctx.textAlign = "right";
-                        ctx.textBaseline = "middle";
-                        ctx.fillText(years[i], 0, 0);
-                        ctx.restore();
+                        const hi = highlightIndex >= 0 && i === highlightIndex;
+                        parts.push(`<circle class="dot-km${hi ? " highlight" : ""}" cx="${xAt(i)}" cy="${yKm(avgKmPerWk[i])}" r="${hi ? 8 : 4}" />`);
+                    }
+                    for (let i = 0; i < n; i++) {
+                        const hi = highlightIndex >= 0 && i === highlightIndex;
+                        parts.push(`<circle class="dot-elev${hi ? " highlight" : ""}" cx="${xAt(i)}" cy="${yElev(avgMPerWk[i])}" r="${hi ? 8 : 4}" />`);
                     }
 
-                    // Plot a single data series as a line with dots.
-                    // The highlighted point (if any) gets a larger dot with a ring.
-                    function drawLine(values, maxVal, color, dashed) {
-                        ctx.beginPath();
-                        ctx.strokeStyle = color;
-                        ctx.lineWidth = 2;
-                        ctx.setLineDash(dashed ? [2, 2] : []);
-                        for (let i = 0; i < n; i++) {
-                            const x = pad.left + (w / (n - 1)) * i;
-                            const y = pad.top + h - (h * values[i] / maxVal);
-                            if (i === 0) ctx.moveTo(x, y);
-                            else ctx.lineTo(x, y);
-                        }
-                        ctx.stroke();
-
-                        ctx.fillStyle = color;
-                        for (let i = 0; i < n; i++) {
-                            const x = pad.left + (w / (n - 1)) * i;
-                            const y = pad.top + h - (h * values[i] / maxVal);
-                            ctx.beginPath();
-                            if (highlightIndex >= 0 && i === highlightIndex) {
-                                ctx.arc(x, y, 8, 0, Math.PI * 2);
-                                ctx.fill();
-                                ctx.strokeStyle = bgColor;
-                                ctx.lineWidth = 2;
-                                ctx.setLineDash([]);
-                                ctx.stroke();
-                            } else {
-                                ctx.arc(x, y, 4, 0, Math.PI * 2);
-                                ctx.fill();
-                            }
-                        }
+                    // Hit targets for click detection
+                    const gap = w / (n - 1);
+                    for (let i = 0; i < n; i++) {
+                        const left = i === 0 ? pad.left : xAt(i) - gap / 2;
+                        const right = i === n - 1 ? pad.left + w : xAt(i) + gap / 2;
+                        parts.push(`<rect class="hit" data-index="${i}" x="${left}" y="${pad.top}" width="${right - left}" height="${h}" />`);
                     }
 
-                    drawLine(avgKmPerWk, maxKm, kmColor, false);
-                    drawLine(avgMPerWk, maxElev, elevColor, true);
-
-                    // Horizontal average lines
-                    //ctx.globalAlpha = 0.3;
-                    if (avgKm != null) {
-                        const y = pad.top + h - (h * avgKm / maxKm);
-                        ctx.beginPath();
-                        ctx.strokeStyle = kmColor;
-                        ctx.lineWidth = 1;
-                        ctx.setLineDash([]);
-                        ctx.moveTo(pad.left, y);
-                        ctx.lineTo(pad.left + w, y);
-                        ctx.stroke();
-                    }
-                    //ctx.globalAlpha = 0.6;
-                    if (avgM != null) {
-                        const y = pad.top + h - (h * avgM / maxElev);
-                        ctx.beginPath();
-                        ctx.strokeStyle = elevColor;
-                        ctx.lineWidth = 1;
-                        ctx.setLineDash([2,2]);
-                        ctx.moveTo(pad.left, y);
-                        ctx.lineTo(pad.left + w, y);
-                        ctx.stroke();
-                    }
-                    ctx.globalAlpha = 1;
+                    svg.setAttribute("viewBox", `0 0 ${cssWidth} ${cssHeight}`);
+                    svg.innerHTML = parts.join("\n");
                 }
 
                 // -- Data loading and table rendering --
@@ -468,18 +407,9 @@
                             tr.style.cursor = "pointer";
                             tr.addEventListener("click", function () { selectYear(idx); });
                         });
-                        var chart = document.getElementById("chart");
-                        chart.style.cursor = "pointer";
-                        chart.addEventListener("click", function (e) {
-                            var rect = this.getBoundingClientRect();
-                            var clickX = e.clientX - rect.left;
-                            var cssWidth = this.clientWidth;
-                            var padLeft = 58, padRight = 65;
-                            var w = cssWidth - padLeft - padRight;
-                            var n = years.length;
-                            var gap = w / (n - 1);
-                            var idx = Math.round((clickX - padLeft) / gap);
-                            if (idx >= 0 && idx < n) selectYear(idx);
+                        document.getElementById("chart").addEventListener("click", function (e) {
+                            const hit = e.target.closest(".hit");
+                            if (hit) selectYear(parseInt(hit.dataset.index));
                         });
                         drawChart(years, avgKmPerWk, avgMPerWk, selectedIndex, avgKm, avgM);
 

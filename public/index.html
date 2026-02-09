@@ -230,7 +230,7 @@
                 // Left axis: km/wk (solid line). Right axis: m/wk (dashed line).
                 // Colors are read from resolved --chart-* CSS custom properties.
                 // Clicking a data point (or table row) highlights it.
-                function drawChart(years, avgKmPerWk, avgMPerWk, highlightIndex) {
+                function drawChart(years, avgKmPerWk, avgMPerWk, highlightIndex, avgKm, avgM) {
                     const canvas = document.getElementById("chart");
                     const ctx = canvas.getContext("2d");
                     const dpr = window.devicePixelRatio || 1;
@@ -351,6 +351,31 @@
 
                     drawLine(avgKmPerWk, maxKm, kmColor, false);
                     drawLine(avgMPerWk, maxElev, elevColor, true);
+
+                    // Horizontal average lines
+                    //ctx.globalAlpha = 0.3;
+                    if (avgKm != null) {
+                        const y = pad.top + h - (h * avgKm / maxKm);
+                        ctx.beginPath();
+                        ctx.strokeStyle = kmColor;
+                        ctx.lineWidth = 1;
+                        ctx.setLineDash([]);
+                        ctx.moveTo(pad.left, y);
+                        ctx.lineTo(pad.left + w, y);
+                        ctx.stroke();
+                    }
+                    //ctx.globalAlpha = 0.6;
+                    if (avgM != null) {
+                        const y = pad.top + h - (h * avgM / maxElev);
+                        ctx.beginPath();
+                        ctx.strokeStyle = elevColor;
+                        ctx.lineWidth = 1;
+                        ctx.setLineDash([2,2]);
+                        ctx.moveTo(pad.left, y);
+                        ctx.lineTo(pad.left + w, y);
+                        ctx.stroke();
+                    }
+                    ctx.globalAlpha = 1;
                 }
 
                 // -- Data loading and table rendering --
@@ -425,6 +450,9 @@
                             "<td>" + (totalDist * KM_TO_MI / totalWeeks).toFixed(1) + "</td>" +
                             "<td>" + Math.round(totalElev * M_TO_FT / totalWeeks).toLocaleString() + "</td>";
                         tfoot.appendChild(avgRow);
+                        const avgKm = totalDist / totalWeeks;
+                        const avgM = totalElev / totalWeeks;
+
                         // Click-to-highlight: clicking a table row or chart
                         // point highlights that year in both the table and chart.
                         // Clicking the same year again deselects it.
@@ -434,7 +462,7 @@
                             selectedIndex = (selectedIndex === idx) ? -1 : idx;
                             rows.forEach(function (r) { r.classList.remove("bg-quiet"); });
                             if (selectedIndex >= 0) rows[selectedIndex].classList.add("bg-quiet");
-                            drawChart(years, avgKmPerWk, avgMPerWk, selectedIndex);
+                            drawChart(years, avgKmPerWk, avgMPerWk, selectedIndex, avgKm, avgM);
                         }
                         rows.forEach(function (tr, idx) {
                             tr.style.cursor = "pointer";
@@ -453,14 +481,14 @@
                             var idx = Math.round((clickX - padLeft) / gap);
                             if (idx >= 0 && idx < n) selectYear(idx);
                         });
-                        drawChart(years, avgKmPerWk, avgMPerWk, selectedIndex);
+                        drawChart(years, avgKmPerWk, avgMPerWk, selectedIndex, avgKm, avgM);
 
                         // Redraw the chart on window resize (debounced).
                         let resizeTimer;
                         window.addEventListener("resize", function () {
                             clearTimeout(resizeTimer);
                             resizeTimer = setTimeout(function () {
-                                drawChart(years, avgKmPerWk, avgMPerWk, selectedIndex);
+                                drawChart(years, avgKmPerWk, avgMPerWk, selectedIndex, avgKm, avgM);
                             }, 100);
                         });
                     });

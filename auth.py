@@ -1,6 +1,7 @@
 '''Library of helper functions for authentication to Strava API.'''
 import json
 import os
+import sys
 import time
 import webbrowser
 from http.server import HTTPServer, BaseHTTPRequestHandler
@@ -82,28 +83,14 @@ def authorize_via_browser(client: Client) -> dict:
 def get_authenticated_client() -> Client:
     """Returns a stravalib Client with a valid access token.
 
-    Tries, in order: reuse a non-expired saved token, refresh an expired
-    token, or run the full OAuth browser flow. Saves fresh tokens to disk.
+    Reuses a non-expired saved token, or runs the full OAuth browser flow.
+    Saves fresh tokens to disk.
     """
     client = Client()
     tokens = load_tokens()
 
     if tokens and tokens["expires_at"] > time.time():
         print("Using saved token.")
-        client.access_token = tokens["access_token"]
-        client.refresh_token = tokens["refresh_token"]
-        client.token_expires = tokens["expires_at"]
-        return client
-
-    if tokens and tokens.get("refresh_token"):
-        print("Token expired, refreshing...")
-        fresh = client.refresh_access_token(
-            client_id=CLIENT_ID,
-            client_secret=CLIENT_SECRET,
-            refresh_token=tokens["refresh_token"],
-        )
-        tokens = dict(fresh)
-        save_tokens(tokens)
         client.access_token = tokens["access_token"]
         client.refresh_token = tokens["refresh_token"]
         client.token_expires = tokens["expires_at"]
@@ -116,3 +103,19 @@ def get_authenticated_client() -> Client:
     client.refresh_token = tokens["refresh_token"]
     client.token_expires = tokens["expires_at"]
     return client
+
+
+def refresh_local_tokens():
+    """Refreshes the Strava access token in .tokens.json."""
+    tokens = load_tokens()
+    if not tokens or not tokens.get("refresh_token"):
+        print("No refresh token found. Run the OAuth flow first.", file=sys.stderr)
+        sys.exit(1)
+
+    fresh = dict(Client().refresh_access_token(
+        client_id=CLIENT_ID,
+        client_secret=CLIENT_SECRET,
+        refresh_token=tokens["refresh_token"],
+    ))
+    save_tokens(fresh)
+    print("Tokens refreshed.")

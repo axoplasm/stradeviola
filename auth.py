@@ -6,7 +6,8 @@ import time
 import webbrowser
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from pathlib import Path
-from urllib.parse import urlparse, parse_qs
+from urllib.parse import urlparse, parse_qs, urlencode
+from urllib.request import urlopen, Request
 
 from dotenv import load_dotenv
 from stravalib import Client
@@ -106,16 +107,23 @@ def get_authenticated_client() -> Client:
 
 
 def refresh_local_tokens():
-    """Refreshes the Strava access token in .tokens.json."""
+    """Refreshes the Strava access token by calling the OAuth endpoint directly."""
     tokens = load_tokens()
     if not tokens or not tokens.get("refresh_token"):
         print("No refresh token found. Run the OAuth flow first.", file=sys.stderr)
         sys.exit(1)
 
-    fresh = dict(Client().refresh_access_token(
-        client_id=CLIENT_ID,
-        client_secret=CLIENT_SECRET,
-        refresh_token=tokens["refresh_token"],
-    ))
-    save_tokens(fresh)
+    data = urlencode({
+        "client_id": CLIENT_ID,
+        "client_secret": CLIENT_SECRET,
+        "grant_type": "refresh_token",
+        "refresh_token": tokens["refresh_token"],
+    }).encode()
+    with urlopen(Request("https://www.strava.com/oauth/token", data=data)) as resp:
+        fresh = json.loads(resp.read())
+    save_tokens({
+        "access_token": fresh["access_token"],
+        "refresh_token": fresh["refresh_token"],
+        "expires_at": fresh["expires_at"],
+    })
     print("Tokens refreshed.")

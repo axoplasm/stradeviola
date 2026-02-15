@@ -187,7 +187,7 @@
             <h1 class="align-center">
                 <span class="🚴">🚴</span><span class="fg-green">Strade</span><span class="fg-purple">Viola</span><span class="😈">😈</span>
             </h1>
-            <p class="align-center">Cycling distance and elevation since <strong>2012</strong> for <a href="https://www.strava.com/athletes/56063">Paul Souders</a></p> 
+            <p class="align-center">Cycling distance and elevation since <strong id="first-year"></strong> for <a href="https://www.strava.com/athletes/56063">Paul Souders</a></p> 
             <svg id="chart"></svg>
             <table>
                 <colgroup span="3"></colgroup>
@@ -334,8 +334,10 @@
                         const tbody = document.getElementById("stats");
                         
                         // Remove any years with partial data:
-                        delete data["2011"];
+                        const firstYear = 2011
+                        delete data[firstYear];
                         const years = Object.keys(data).sort((a, b) => a - b);
+                        document.getElementById("first-year").textContent = years[0];
                         const avgKmPerWk = [];
                         const avgMPerWk = [];
                         let totalCount = 0, totalTime = 0, totalDist = 0, totalElev = 0, totalWeeks = 0;

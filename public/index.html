@@ -106,19 +106,24 @@
             }
 
             a {
+                font-weight: var(--bold-weight);
                 text-decoration: none;
                 transition: all 0.2s ease-in-out;
+                &:after {
+                    content: ' →';
+                }
                 &:link, &:visited {
                     background-color: transparent;
-                    border: 2px solid var(--green);
+                    border: 1.5px solid var(--green);
                     color: var(--green);
-                    padding: 5px;
+                    padding: 4px 5px;
                 }
                 &:hover {
                     background-color: var(--purple);
                     border-color: var(--purple);
                     color: var(--silent);
-                    padding: 9px;
+                    margin: -4px;
+                    padding: 8px 9px;
                 }
             }
 
@@ -182,6 +187,7 @@
             <h1 class="align-center">
                 <span class="🚴">🚴</span><span class="fg-green">Strade</span><span class="fg-purple">Viola</span><span class="😈">😈</span>
             </h1>
+            <p class="align-center">Cycling distance and elevation since <strong>2012</strong> for <a href="https://www.strava.com/athletes/56063">Paul Souders</a></p> 
             <svg id="chart"></svg>
             <table>
                 <colgroup span="3"></colgroup>
@@ -205,7 +211,7 @@
                 <tbody id="stats"></tbody>
                 <tfoot id="totals"></tfoot>
             </table>
-            <p class="align-center"><strong><a href="https://github.com/axoplasm/stradeviola">Project on GitHub →</a></strong></p>
+            <p class="align-center"><strong><a href="https://github.com/axoplasm/stradeviola" class="">Project on GitHub</a></strong></p>
             <script>
                 // -- Constants --
 

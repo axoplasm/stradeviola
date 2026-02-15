@@ -41,26 +41,27 @@ def update_data():
     if tokens and tokens.get("refresh_token") and tokens["expires_at"] <= time.time():
         refresh_local_tokens()
     client = get_authenticated_client()
+    athlete = client.get_athlete()
+    athlete_info = {
+        "name": f"{athlete.firstname} {athlete.lastname}",
+        "id": athlete.id,
+    }
     current_year = str(datetime.now().year)
 
     if DATA_FILE.exists():
         saved = json.loads(DATA_FILE.read_text())
+        years = saved.get("years", {k: v for k, v in saved.items() if k.isdigit()})
         print(f"Fetching {current_year} activities...", flush=True)
         fresh = aggregate(client.get_activities(after=datetime(int(current_year), 1, 1)))
         current = fresh.get(current_year, {"count": 0, "time": 0, "distance": 0.0, "elevation": 0.0})
-        if saved.get(current_year) != current:
-            saved[current_year] = current
-            with open(DATA_FILE, "w") as f:
-                json.dump(saved, f, indent=2)
-            print(f"Updated {current_year} in {DATA_FILE}")
-        else:
-            print("Data is up to date.")
+        years[current_year] = current
     else:
         print("Fetching all activities...", flush=True)
-        saved = aggregate(client.get_activities())
-        with open(DATA_FILE, "w") as f:
-            json.dump(dict(sorted(saved.items())), f, indent=2)
-        print(f"Saved data to {DATA_FILE}")
+        years = aggregate(client.get_activities())
+
+    with open(DATA_FILE, "w") as f:
+        json.dump({"athlete": athlete_info, "years": dict(sorted(years.items()))}, f, indent=2)
+    print(f"Saved data to {DATA_FILE}")
 
 
 if __name__ == "__main__":

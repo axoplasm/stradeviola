@@ -187,7 +187,7 @@
             <h1 class="align-center">
                 <span class="🚴">🚴</span><span class="fg-green">Strade</span><span class="fg-purple">Viola</span><span class="😈">😈</span>
             </h1>
-            <p class="align-center">Cycling distance and elevation since <strong id="first-year"></strong> for <a href="https://www.strava.com/athletes/56063">Paul Souders</a></p> 
+            <p class="align-center">Cycling distance and elevation since <strong id="first-year"></strong> for <a id="athlete-link"></a></p> 
             <svg id="chart"></svg>
             <table>
                 <colgroup span="3"></colgroup>
@@ -330,19 +330,23 @@
                 // interaction between the table rows and chart data points.
                 fetch("/data.json")
                     .then(res => res.json())
-                    .then(data => {
+                    .then(({athlete, years: yearData}) => {
                         const tbody = document.getElementById("stats");
-                        
+
+                        const athleteLink = document.getElementById("athlete-link");
+                        athleteLink.href = `https://www.strava.com/athletes/${athlete.id}`;
+                        athleteLink.textContent = athlete.name;
+
                         // Remove any years with partial data:
                         const firstYear = 2011
-                        delete data[firstYear];
-                        const years = Object.keys(data).sort((a, b) => a - b);
+                        delete yearData[firstYear];
+                        const years = Object.keys(yearData).sort((a, b) => a - b);
                         document.getElementById("first-year").textContent = years[0];
                         const avgKmPerWk = [];
                         const avgMPerWk = [];
                         let totalCount = 0, totalTime = 0, totalDist = 0, totalElev = 0, totalWeeks = 0;
                         for (const year of years) {
-                            const y = data[year];
+                            const y = yearData[year];
                             const weeks = weeksInYear(year);
                             avgKmPerWk.push(y.distance / weeks);
                             avgMPerWk.push(y.elevation / weeks);

@@ -2,6 +2,7 @@
 import json
 import os
 import time
+from pathlib import Path
 from urllib.parse import urlencode
 from urllib.request import urlopen, Request
 
@@ -59,6 +60,26 @@ def get_client():
 
 
 PUBLIC = os.path.join(os.path.dirname(__file__), "public")
+CACHE_DIR = Path(__file__).parent / ".cache"
+CACHE_TTL = 3600  # 1 hour
+
+
+def read_cache(athlete_id):
+    """Returns cached data dict for an athlete, or None if missing/stale."""
+    path = CACHE_DIR / f"{athlete_id}.json"
+    if not path.exists():
+        return None
+    cached = json.loads(path.read_text())
+    if time.time() - cached["fetched_at"] > CACHE_TTL:
+        return None
+    return cached["data"]
+
+
+def write_cache(athlete_id, data):
+    """Writes an athlete's data dict to the file cache."""
+    CACHE_DIR.mkdir(exist_ok=True)
+    path = CACHE_DIR / f"{athlete_id}.json"
+    path.write_text(json.dumps({"fetched_at": time.time(), "data": data}))
 
 
 @app.route("/")
@@ -113,12 +134,19 @@ def api_data():
     if not client:
         return jsonify({"error": "Not authenticated"}), 401
     athlete = client.get_athlete()
+    refresh = request.args.get("refresh")
+    if not refresh:
+        cached = read_cache(athlete.id)
+        if cached:
+            return jsonify(cached)
     athlete_info = {
         "name": f"{athlete.firstname} {athlete.lastname}",
         "id": athlete.id,
     }
     years = aggregate(client.get_activities())
-    return jsonify({"athlete": athlete_info, "years": dict(sorted(years.items()))})
+    data = {"athlete": athlete_info, "years": dict(sorted(years.items()))}
+    write_cache(athlete.id, data)
+    return jsonify(data)
 
 
 @app.route("/<path:filename>")

@@ -32,6 +32,7 @@ venv/
 
 # User-generated data
 data.json
+.cache/
 
 # logs
 *.log

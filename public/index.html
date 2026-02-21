@@ -375,9 +375,10 @@
                         }
                         select.value = allYears[0];
 
-                        // Renders the table and chart starting from firstYear.
-                        function render(firstYear) {
-                            const years = allYears.filter(y => parseInt(y) >= parseInt(firstYear));
+                        // Populates the table body and footer rows for the
+                        // given years. Returns per-year and overall averages
+                        // needed by drawChart.
+                        function drawTable(years, yearData) {
                             tbody.innerHTML = "";
                             tfoot.innerHTML = "";
 
@@ -439,8 +440,14 @@
                                 "<td>" + (totalDist * KM_TO_MI / totalWeeks).toFixed(1) + "</td>" +
                                 "<td>" + Math.round(totalElev * M_TO_FT / totalWeeks).toLocaleString() + "</td>";
                             tfoot.appendChild(avgRow);
-                            const avgKm = totalDist / totalWeeks;
-                            const avgM = totalElev / totalWeeks;
+
+                            return { avgKmPerWk, avgMPerWk, avgKm: totalDist / totalWeeks, avgM: totalElev / totalWeeks };
+                        }
+
+                        // Renders the table and chart starting from firstYear.
+                        function render(firstYear) {
+                            const years = allYears.filter(y => parseInt(y) >= parseInt(firstYear));
+                            const { avgKmPerWk, avgMPerWk, avgKm, avgM } = drawTable(years, yearData);
 
                             // Click-to-highlight: clicking a table row or chart
                             // point highlights that year in both the table and chart.

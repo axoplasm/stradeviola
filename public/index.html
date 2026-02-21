@@ -212,9 +212,11 @@
             <h1 class="align-center">
                 <span class="🚴">🚴</span><span class="fg-green">Strade</span><span class="fg-purple">Viola</span><span class="😈">😈</span>
             </h1>
-            <p class="align-center">Cycling <span class="fg-green">distance</span> and <span class="fg-purple">elevation</span> since <select id="first-year-select"></select> for <a id="athlete-link"></a></p>
-            <svg id="chart"></svg>
-            <table>
+            <p id="intro" class="align-center" hidden>Cycling <span class="fg-green">distance</span> and <span class="fg-purple">elevation</span> since <select id="first-year-select"></select> for <a id="athlete-link"></a></p>
+            <p id="connect" class="align-center" hidden>Track your cycling <span class="fg-green">distance</span> and <span class="fg-purple">elevation</span> — <a href="/auth/strava">Connect with Strava</a></p>
+            <p id="loading" class="align-center" hidden>Loading activities from Strava…</p>
+            <svg id="chart" hidden></svg>
+            <table hidden>
                 <colgroup span="3"></colgroup>
                 <colgroup span="4"></colgroup>
                 <colgroup span="4"></colgroup>
@@ -353,9 +355,23 @@
                 // Fetch yearly stats, populate the table (per-year rows, totals,
                 // averages), draw the chart, and wire up click-to-highlight
                 // interaction between the table rows and chart data points.
-                fetch("/data.json")
+                fetch("/api/status")
                     .then(res => res.json())
-                    .then(({athlete, years: yearData}) => {
+                    .then(({authenticated}) => {
+                        if (!authenticated) {
+                            document.getElementById("connect").hidden = false;
+                            return;
+                        }
+                        document.getElementById("loading").hidden = false;
+                        return fetch("/api/data").then(res => res.json());
+                    })
+                    .then(data => {
+                        if (!data) return;
+                        document.getElementById("loading").hidden = true;
+                        document.getElementById("intro").hidden = false;
+                        document.getElementById("chart").hidden = false;
+                        document.querySelector("table").hidden = false;
+                        const {athlete, years: yearData} = data;
                         const tbody = document.getElementById("stats");
                         const tfoot = document.getElementById("totals");
                         const select = document.getElementById("first-year-select");

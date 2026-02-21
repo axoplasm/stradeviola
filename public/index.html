@@ -169,14 +169,21 @@
                 .hit { fill: transparent; }
             }
             select {
-                appearance: auto;
-                background-color: var(--quiet);
-                border: var(--border-width) solid var(--hushed);
-                color: var(--loud);
-                font-family: var(--monospace);
-                font-size: var(--default-font-size);
-                padding: 4px 8px;
-                cursor: pointer;
+                background-color: var(--silent);
+                border: 1.5px solid var(--loud);
+                padding-block: 2px;
+                padding-inline: 5px 2rem;
+
+                /* arrow */
+                /* note hardcoded hex codes */
+                background-position: right 0.5rem center;
+                background-repeat: no-repeat;
+                background-image: url('data:image/svg+xml,<svg width="12px" height="6px" viewBox="0 0 12 6" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"><polygon id="Path" fill="%23000" points="0 0 6 6 12 0"></polygon></g></svg>');
+            }
+            @media (prefers-color-scheme: dark) {
+                select {
+                    background-image: url('data:image/svg+xml,<svg width="12px" height="6px" viewBox="0 0 12 6" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"><polygon id="Path" fill="%23fff" points="0 0 6 6 12 0"></polygon></g></svg>');
+                }
             }
             .align-center { text-align: center; }
             .fg-green { color: var(--green); }

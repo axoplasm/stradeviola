@@ -168,6 +168,16 @@
                 .highlight { stroke: var(--chart-bg); stroke-width: 2; }
                 .hit { fill: transparent; }
             }
+            select {
+                appearance: auto;
+                background-color: var(--quiet);
+                border: var(--border-width) solid var(--hushed);
+                color: var(--loud);
+                font-family: var(--monospace);
+                font-size: var(--default-font-size);
+                padding: 4px 8px;
+                cursor: pointer;
+            }
             .align-center { text-align: center; }
             .fg-green { color: var(--green); }
             .fg-purple { color: var(--purple); }
@@ -195,7 +205,7 @@
             <h1 class="align-center">
                 <span class="🚴">🚴</span><span class="fg-green">Strade</span><span class="fg-purple">Viola</span><span class="😈">😈</span>
             </h1>
-            <p class="align-center">Cycling <span class="fg-green">distance</span> and <span class="fg-purple">elevation</span> since <strong id="first-year"></strong> for <a id="athlete-link"></a></p> 
+            <p class="align-center">Cycling <span class="fg-green">distance</span> and <span class="fg-purple">elevation</span> since <select id="first-year-select"></select> for <a id="athlete-link"></a></p>
             <svg id="chart"></svg>
             <table>
                 <colgroup span="3"></colgroup>
@@ -340,106 +350,126 @@
                     .then(res => res.json())
                     .then(({athlete, years: yearData}) => {
                         const tbody = document.getElementById("stats");
+                        const tfoot = document.getElementById("totals");
+                        const select = document.getElementById("first-year-select");
 
                         const athleteLink = document.getElementById("athlete-link");
                         athleteLink.href = `https://www.strava.com/athletes/${athlete.id}`;
                         athleteLink.textContent = athlete.name;
 
-                        // Remove any years with partial data:
-                        const firstYear = 2011
-                        delete yearData[firstYear];
-                        const years = Object.keys(yearData).sort((a, b) => a - b);
-                        document.getElementById("first-year").textContent = years[0];
-                        const avgKmPerWk = [];
-                        const avgMPerWk = [];
-                        let totalCount = 0, totalTime = 0, totalDist = 0, totalElev = 0, totalWeeks = 0;
-                        for (const year of years) {
-                            const y = yearData[year];
-                            const weeks = weeksInYear(year);
-                            avgKmPerWk.push(y.distance / weeks);
-                            avgMPerWk.push(y.elevation / weeks);
-                            totalCount += y.count;
-                            totalTime += y.time;
-                            totalDist += y.distance;
-                            totalElev += y.elevation;
-                            totalWeeks += weeks;
-                            const tr = document.createElement("tr");
-                            tr.innerHTML =
-                                "<th>" + year + "</th>" +
-                                "<td>" + y.count.toLocaleString() + "</td>" +
-                                "<td>" + formatTime(y.time) + "</td>" +
-                                "<td>" + y.distance.toLocaleString(undefined, {minimumFractionDigits: 1, maximumFractionDigits: 1}) + "</td>" +
-                                "<td>" + Math.round(y.elevation).toLocaleString() + "</td>" +
-                                "<td class='fg-green'>" + (y.distance / weeks).toFixed(1) + "</td>" +
-                                "<td class='fg-purple'>" + Math.round(y.elevation / weeks).toLocaleString() + "</td>" +
-                                "<td>" + (y.distance * KM_TO_MI).toLocaleString(undefined, {minimumFractionDigits: 1, maximumFractionDigits: 1}) + "</td>" +
-                                "<td>" + Math.round(y.elevation * M_TO_FT).toLocaleString() + "</td>" +
-                                "<td>" + (y.distance * KM_TO_MI / weeks).toFixed(1) + "</td>" +
-                                "<td>" + Math.round(y.elevation * M_TO_FT / weeks).toLocaleString() + "</td>";
-                            tbody.appendChild(tr);
+                        // Populate the select with all years except the last
+                        // (need at least one year to display).
+                        const allYears = Object.keys(yearData).sort((a, b) => a - b);
+                        for (let i = 0; i < allYears.length - 1; i++) {
+                            const opt = document.createElement("option");
+                            opt.value = allYears[i];
+                            opt.textContent = allYears[i];
+                            select.appendChild(opt);
                         }
-                        const tfoot = document.getElementById("totals");
-                        const tfootRow = document.createElement("tr");
-                        tfootRow.innerHTML =
-                            "<th>TOTAL</th>" +
-                            "<td>" + totalCount.toLocaleString() + "</td>" +
-                            "<td>" + formatTime(totalTime) + "</td>" +
-                            "<td>" + totalDist.toLocaleString(undefined, {minimumFractionDigits: 1, maximumFractionDigits: 1}) + "</td>" +
-                            "<td>" + Math.round(totalElev).toLocaleString() + "</td>" +
-                            "<td></td>" +
-                            "<td></td>" +
-                            "<td>" + (totalDist * KM_TO_MI).toLocaleString(undefined, {minimumFractionDigits: 1, maximumFractionDigits: 1}) + "</td>" +
-                            "<td>" + Math.round(totalElev * M_TO_FT).toLocaleString() + "</td>" +
-                            "<td></td>" +
-                            "<td></td>";
-                        tfoot.appendChild(tfootRow);
-                        const currentYearFraction = weeksInYear(String(new Date().getFullYear())) / 52;
-                        const effectiveYears = years.length - 1 + currentYearFraction;
-                        const avgRow = document.createElement("tr");
-                        avgRow.innerHTML =
-                            "<th>AVG</th>" +
-                            "<td>" + Math.round(totalCount / effectiveYears).toLocaleString() + "</td>" +
-                            "<td>" + formatTime(Math.round(totalTime / effectiveYears)) + "</td>" +
-                            "<td>" + (totalDist / effectiveYears).toLocaleString(undefined, {minimumFractionDigits: 1, maximumFractionDigits: 1}) + "</td>" +
-                            "<td>" + Math.round(totalElev / effectiveYears).toLocaleString() + "</td>" +
-                            "<td class='fg-green'>" + (totalDist / totalWeeks).toFixed(1) + "</td>" +
-                            "<td class='fg-purple'>" + Math.round(totalElev / totalWeeks).toLocaleString() + "</td>" +
-                            "<td>" + (totalDist * KM_TO_MI / effectiveYears).toLocaleString(undefined, {minimumFractionDigits: 1, maximumFractionDigits: 1}) + "</td>" +
-                            "<td>" + Math.round(totalElev * M_TO_FT / effectiveYears).toLocaleString() + "</td>" +
-                            "<td>" + (totalDist * KM_TO_MI / totalWeeks).toFixed(1) + "</td>" +
-                            "<td>" + Math.round(totalElev * M_TO_FT / totalWeeks).toLocaleString() + "</td>";
-                        tfoot.appendChild(avgRow);
-                        const avgKm = totalDist / totalWeeks;
-                        const avgM = totalElev / totalWeeks;
+                        select.value = allYears[0];
 
-                        // Click-to-highlight: clicking a table row or chart
-                        // point highlights that year in both the table and chart.
-                        // Clicking the same year again deselects it.
-                        var selectedIndex = -1;
-                        var rows = tbody.querySelectorAll("tr");
-                        function selectYear(idx) {
-                            selectedIndex = (selectedIndex === idx) ? -1 : idx;
-                            rows.forEach(function (r) { r.classList.remove("bg-highlight"); });
-                            if (selectedIndex >= 0) rows[selectedIndex].classList.add("bg-highlight");
-                            drawChart(years, avgKmPerWk, avgMPerWk, selectedIndex, avgKm, avgM);
-                        }
-                        rows.forEach(function (tr, idx) {
-                            tr.style.cursor = "pointer";
-                            tr.addEventListener("click", function () { selectYear(idx); });
-                        });
-                        document.getElementById("chart").addEventListener("click", function (e) {
-                            const hit = e.target.closest(".hit");
-                            if (hit) selectYear(parseInt(hit.dataset.index));
-                        });
-                        drawChart(years, avgKmPerWk, avgMPerWk, selectedIndex, avgKm, avgM);
+                        // Renders the table and chart starting from firstYear.
+                        function render(firstYear) {
+                            const years = allYears.filter(y => parseInt(y) >= parseInt(firstYear));
+                            tbody.innerHTML = "";
+                            tfoot.innerHTML = "";
 
-                        // Redraw the chart on window resize (debounced).
-                        let resizeTimer;
-                        window.addEventListener("resize", function () {
-                            clearTimeout(resizeTimer);
-                            resizeTimer = setTimeout(function () {
+                            const avgKmPerWk = [];
+                            const avgMPerWk = [];
+                            let totalCount = 0, totalTime = 0, totalDist = 0, totalElev = 0, totalWeeks = 0;
+                            for (const year of years) {
+                                const y = yearData[year];
+                                const weeks = weeksInYear(year);
+                                avgKmPerWk.push(y.distance / weeks);
+                                avgMPerWk.push(y.elevation / weeks);
+                                totalCount += y.count;
+                                totalTime += y.time;
+                                totalDist += y.distance;
+                                totalElev += y.elevation;
+                                totalWeeks += weeks;
+                                const tr = document.createElement("tr");
+                                tr.innerHTML =
+                                    "<th>" + year + "</th>" +
+                                    "<td>" + y.count.toLocaleString() + "</td>" +
+                                    "<td>" + formatTime(y.time) + "</td>" +
+                                    "<td>" + y.distance.toLocaleString(undefined, {minimumFractionDigits: 1, maximumFractionDigits: 1}) + "</td>" +
+                                    "<td>" + Math.round(y.elevation).toLocaleString() + "</td>" +
+                                    "<td class='fg-green'>" + (y.distance / weeks).toFixed(1) + "</td>" +
+                                    "<td class='fg-purple'>" + Math.round(y.elevation / weeks).toLocaleString() + "</td>" +
+                                    "<td>" + (y.distance * KM_TO_MI).toLocaleString(undefined, {minimumFractionDigits: 1, maximumFractionDigits: 1}) + "</td>" +
+                                    "<td>" + Math.round(y.elevation * M_TO_FT).toLocaleString() + "</td>" +
+                                    "<td>" + (y.distance * KM_TO_MI / weeks).toFixed(1) + "</td>" +
+                                    "<td>" + Math.round(y.elevation * M_TO_FT / weeks).toLocaleString() + "</td>";
+                                tbody.appendChild(tr);
+                            }
+                            const tfootRow = document.createElement("tr");
+                            tfootRow.innerHTML =
+                                "<th>TOTAL</th>" +
+                                "<td>" + totalCount.toLocaleString() + "</td>" +
+                                "<td>" + formatTime(totalTime) + "</td>" +
+                                "<td>" + totalDist.toLocaleString(undefined, {minimumFractionDigits: 1, maximumFractionDigits: 1}) + "</td>" +
+                                "<td>" + Math.round(totalElev).toLocaleString() + "</td>" +
+                                "<td></td>" +
+                                "<td></td>" +
+                                "<td>" + (totalDist * KM_TO_MI).toLocaleString(undefined, {minimumFractionDigits: 1, maximumFractionDigits: 1}) + "</td>" +
+                                "<td>" + Math.round(totalElev * M_TO_FT).toLocaleString() + "</td>" +
+                                "<td></td>" +
+                                "<td></td>";
+                            tfoot.appendChild(tfootRow);
+                            const currentYearFraction = weeksInYear(String(new Date().getFullYear())) / 52;
+                            const effectiveYears = years.length - 1 + currentYearFraction;
+                            const avgRow = document.createElement("tr");
+                            avgRow.innerHTML =
+                                "<th>AVG</th>" +
+                                "<td>" + Math.round(totalCount / effectiveYears).toLocaleString() + "</td>" +
+                                "<td>" + formatTime(Math.round(totalTime / effectiveYears)) + "</td>" +
+                                "<td>" + (totalDist / effectiveYears).toLocaleString(undefined, {minimumFractionDigits: 1, maximumFractionDigits: 1}) + "</td>" +
+                                "<td>" + Math.round(totalElev / effectiveYears).toLocaleString() + "</td>" +
+                                "<td class='fg-green'>" + (totalDist / totalWeeks).toFixed(1) + "</td>" +
+                                "<td class='fg-purple'>" + Math.round(totalElev / totalWeeks).toLocaleString() + "</td>" +
+                                "<td>" + (totalDist * KM_TO_MI / effectiveYears).toLocaleString(undefined, {minimumFractionDigits: 1, maximumFractionDigits: 1}) + "</td>" +
+                                "<td>" + Math.round(totalElev * M_TO_FT / effectiveYears).toLocaleString() + "</td>" +
+                                "<td>" + (totalDist * KM_TO_MI / totalWeeks).toFixed(1) + "</td>" +
+                                "<td>" + Math.round(totalElev * M_TO_FT / totalWeeks).toLocaleString() + "</td>";
+                            tfoot.appendChild(avgRow);
+                            const avgKm = totalDist / totalWeeks;
+                            const avgM = totalElev / totalWeeks;
+
+                            // Click-to-highlight: clicking a table row or chart
+                            // point highlights that year in both the table and chart.
+                            // Clicking the same year again deselects it.
+                            var selectedIndex = -1;
+                            var rows = tbody.querySelectorAll("tr");
+                            function selectYear(idx) {
+                                selectedIndex = (selectedIndex === idx) ? -1 : idx;
+                                rows.forEach(function (r) { r.classList.remove("bg-highlight"); });
+                                if (selectedIndex >= 0) rows[selectedIndex].classList.add("bg-highlight");
                                 drawChart(years, avgKmPerWk, avgMPerWk, selectedIndex, avgKm, avgM);
-                            }, 100);
+                            }
+                            rows.forEach(function (tr, idx) {
+                                tr.style.cursor = "pointer";
+                                tr.addEventListener("click", function () { selectYear(idx); });
+                            });
+                            document.getElementById("chart").addEventListener("click", function (e) {
+                                const hit = e.target.closest(".hit");
+                                if (hit) selectYear(parseInt(hit.dataset.index));
+                            });
+                            drawChart(years, avgKmPerWk, avgMPerWk, selectedIndex, avgKm, avgM);
+
+                            // Redraw the chart on window resize (debounced).
+                            let resizeTimer;
+                            window.addEventListener("resize", function () {
+                                clearTimeout(resizeTimer);
+                                resizeTimer = setTimeout(function () {
+                                    drawChart(years, avgKmPerWk, avgMPerWk, selectedIndex, avgKm, avgM);
+                                }, 100);
+                            });
+                        }
+
+                        render(select.value);
+
+                        select.addEventListener("change", function () {
+                            render(select.value);
                         });
                     });
             </script>

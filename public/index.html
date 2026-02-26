@@ -373,7 +373,9 @@
                             opt.textContent = allYears[i];
                             select.appendChild(opt);
                         }
-                        select.value = allYears[0];
+                        const params = new URLSearchParams(location.search);
+                        const paramYear = params.get("y");
+                        select.value = (paramYear && allYears.includes(paramYear)) ? paramYear : allYears[0];
 
                         // Populates the table body and footer rows for the
                         // given years. Returns per-year and overall averages
@@ -483,6 +485,9 @@
                         render(select.value);
 
                         select.addEventListener("change", function () {
+                            const url = new URL(location);
+                            url.searchParams.set("y", select.value);
+                            history.replaceState(null, "", url);
                             render(select.value);
                         });
                     });
